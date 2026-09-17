@@ -1,0 +1,20 @@
+/* TanzaniaTrip — cinematic transparent glass layer */
+:root{--glass:rgba(255,255,255,.105);--glass2:rgba(255,255,255,.16);--line:rgba(255,255,255,.30);--gold:#f2d17a;--silver:#eef2f5}
+body{background:#050708 url('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=2400&q=92') center top/cover fixed no-repeat!important;color:#fff!important}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.68));pointer-events:none}
+.navbar{background:rgba(7,9,11,.28)!important;border-bottom:1px solid var(--line)!important;box-shadow:0 15px 50px #0005!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.brand{color:#fff!important}.brand-mark{background:linear-gradient(145deg,#fffdf0,var(--gold),#a8782b)!important;color:#111!important;box-shadow:inset 0 1px #fff,0 8px 25px #0007!important}
+.nav-link{color:#fff!important;opacity:.86}.nav-link:hover,.nav-link.active{color:var(--gold)!important;opacity:1}
+.portal-hero{min-height:790px!important;background:linear-gradient(90deg,rgba(0,0,0,.70),rgba(0,0,0,.20) 62%,rgba(0,0,0,.05)),url('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=2400&q=92') center/cover!important}
+.portal-hero:before{background:radial-gradient(circle at 80% 24%,rgba(242,209,122,.20),transparent 23%),linear-gradient(0deg,rgba(0,0,0,.72),transparent 50%)!important}
+.portal-hero h1{font-family:Georgia,serif!important;text-shadow:0 15px 45px #0009!important}.portal-hero p{color:#fff!important;opacity:.84}
+.portal-grid{margin-top:-115px!important}
+.portal-card{border:1px solid var(--line)!important;background:var(--glass)!important;border-radius:30px!important;box-shadow:0 30px 90px #0008,inset 0 1px #fff3!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .35s ease,box-shadow .35s ease!important}
+.portal-card:before{background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 40%)!important}.portal-card:after{background:linear-gradient(transparent 15%,rgba(0,0,0,.92))!important}.portal-card:hover{transform:translateY(-11px) scale(1.012)!important;box-shadow:0 42px 110px #000a,inset 0 1px #fff5!important}
+.portal-card .inside{padding:34px!important}.portal-card .inside p{color:#fff!important;opacity:.78}
+.section{background:rgba(0,0,0,.16)!important}.section h2{color:#fff!important}.kicker,.eyebrow{color:var(--gold)!important}
+.system,.system .item,.card-premium{background:var(--glass)!important;border:1px solid var(--line)!important;box-shadow:0 28px 80px #0006,inset 0 1px #fff2!important;color:#fff!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.system .item{background:rgba(255,255,255,.055)!important}.system .item p,.system .item .text-secondary{color:rgba(255,255,255,.68)!important}.system .item i{color:var(--gold)!important}
+.btn-gold{background:linear-gradient(135deg,#fff8da,#f0ce76 48%,#b5812f)!important;color:#111!important;border:1px solid #fff8df!important;box-shadow:0 15px 35px #0006,inset 0 1px #fff!important}.btn-outline-light{border-color:#fff8!important;background:rgba(255,255,255,.08)!important;backdrop-filter:blur(12px)}
+footer{background:rgba(4,5,7,.65)!important;border-top:1px solid var(--line)!important;backdrop-filter:blur(20px)}.footer-link{color:#fff!important;opacity:.72}.footer-link:hover{color:var(--gold)!important;opacity:1}
+@media(max-width:767px){.portal-hero{min-height:720px!important;background-position:64% center!important}.portal-hero h1{font-size:3.35rem!important}.portal-grid{margin-top:-42px!important}.portal-card{min-height:390px!important}.portal-card .inside{padding:24px!important}.system{padding:18px!important}.navbar .nav-link{padding:12px 6px!important}}
