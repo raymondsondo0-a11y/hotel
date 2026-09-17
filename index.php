@@ -1,0 +1,36 @@
+<?php
+?><!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TanzaniaTrip — Build Your Tanzania Journey</title>
+<style>
+:root{--green:#0b5d3b;--dark:#071d17;--gold:#d9a441;--cream:#f7f4ea;--white:#fff;--muted:#65736d;--line:#dce5df}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--dark)}header{background:var(--dark);color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center}header b{font-size:22px;color:#fff}header span{color:#b8d5c7;font-size:14px}.hero{padding:70px 6% 45px;background:linear-gradient(135deg,#073d2a,#0b5d3b);color:#fff}.hero h1{font-size:clamp(38px,6vw,68px);max-width:800px;margin:0 0 18px}.hero p{font-size:19px;max-width:700px;color:#dcece5}.wrap{max-width:1180px;margin:auto;padding:28px 20px 70px}.planner{margin-top:-35px;background:#fff;border-radius:20px;padding:25px;box-shadow:0 15px 45px #123a2620}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:7px;color:#53645d}.field input,.field select{width:100%;padding:13px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fff}.interests{margin-top:18px}.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}.chips label{border:1px solid var(--line);padding:10px 13px;border-radius:999px;cursor:pointer}.chips input{margin-right:5px}.btn{margin-top:22px;background:var(--green);color:white;border:0;padding:14px 20px;border-radius:11px;font-size:16px;font-weight:700;cursor:pointer}.section-title{margin:45px 0 18px;font-size:27px}.days{display:grid;gap:14px}.day{background:white;border:1px solid var(--line);border-radius:16px;padding:20px}.day h3{margin:0 0 8px;color:var(--green)}.day p{margin:5px 0;color:#53645d}.costs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.cost{background:#fff;border:1px solid var(--line);padding:18px;border-radius:15px}.cost small{color:var(--muted)}.cost strong{display:block;margin-top:7px;font-size:20px}.total{background:var(--dark);color:white}.total small{color:#b8d5c7}.total strong{color:#fff}.note{margin-top:18px;color:var(--muted);font-size:13px}footer{background:var(--dark);color:#c5d8d0;padding:30px 6%;text-align:center}@media(max-width:850px){.grid,.costs{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid,.costs{grid-template-columns:1fr}.hero{padding-top:45px}}
+</style>
+</head>
+<body>
+<header><b>🇹🇿 TanzaniaTrip</b><span>Plan Tanzania with confidence</span></header>
+<section class="hero"><h1>Build your Tanzania trip in minutes.</h1><p>Choose your days, interests and travel style. TanzaniaTrip creates a practical day-by-day journey and an approximate trip budget.</p></section>
+<main class="wrap">
+<section class="planner">
+<div class="grid">
+<div class="field"><label>Days</label><input id="days" type="number" min="1" max="21" value="5"></div>
+<div class="field"><label>Travellers</label><input id="people" type="number" min="1" max="30" value="2"></div>
+<div class="field"><label>Travel style</label><select id="style"><option value="budget">Budget</option><option value="standard" selected>Standard</option><option value="comfort">Comfort</option></select></div>
+<div class="field"><label>Starting area</label><select id="start"><option>Dodoma</option><option>Dar es Salaam</option><option>Arusha</option><option>Mwanza</option><option>Zanzibar</option><option>Mbeya</option></select></div>
+</div>
+<div class="interests"><b>What do you want to experience?</b><div class="chips">
+<label><input type="checkbox" value="Wildlife" checked>Wildlife</label><label><input type="checkbox" value="Culture" checked>Culture</label><label><input type="checkbox" value="City">City</label><label><input type="checkbox" value="Nature">Nature</label><label><input type="checkbox" value="Beach">Beach</label><label><input type="checkbox" value="Food">Food</label>
+</div></div>
+<button class="btn" onclick="generate()">Generate my Tanzania trip →</button>
+</section>
+<h2 class="section-title">Your itinerary</h2><section id="itinerary" class="days"></section>
+<h2 class="section-title">Estimated trip cost</h2><section id="costs" class="costs"></section><p class="note">Estimates are planning figures, not live hotel, transport or attraction quotations. Actual prices vary by location, season, provider and booking date.</p>
+</main><footer>© TanzaniaTrip — Tanzania travel planning platform</footer>
+<script>
+const places={Wildlife:['National park safari','Wildlife viewing and guided game drive'],Culture:['Local cultural experience','Visit a community, heritage site or craft market'],City:['City exploration','Markets, landmarks and a guided city walk'],Nature:['Nature adventure','Waterfall, viewpoint, forest or scenic landscape'],Beach:['Beach day','Coastal relaxation and water activities'],Food:['Tanzanian food experience','Local restaurant and street-food tasting']};
+function money(n){return new Intl.NumberFormat('en-TZ').format(Math.round(n))+' TZS'}
+function generate(){const days=Math.max(1,Math.min(21,+document.getElementById('days').value||5));const people=Math.max(1,+document.getElementById('people').value||2);const start=document.getElementById('start').value;const style=document.getElementById('style').value;let interests=[...document.querySelectorAll('.chips input:checked')].map(x=>x.value);if(!interests.length)interests=['Culture','Nature'];let html='';for(let i=1;i<=days;i++){let title,desc;if(i===1){title='Arrival & local discovery';desc=`Arrive in ${start}, settle into your accommodation, then explore a nearby attraction and local food.`}else if(i===days){title='Return, shopping & departure';desc=`Enjoy a relaxed final morning, optional shopping and arrange transport back to your departure point.`}else{let key=interests[(i-2)%interests.length],x=places[key];title=x[0];desc=x[1]+'. Plan the day around a convenient route and return to your accommodation in the evening.'}html+=`<article class="day"><h3>Day ${i} — ${title}</h3><p>${desc}</p><p><b>Planning tip:</b> Keep travel time between activities realistic and confirm opening times before departure.</p></article>`}document.getElementById('itinerary').innerHTML=html;
+let mult={budget:.72,standard:1,comfort:1.55}[style],rooms=Math.ceil(people/2),nights=Math.max(1,days-1);let accommodation=65000*rooms*nights*mult,transport=55000*days*mult,activities=70000*people*Math.max(1,days-2)*mult,food=45000*people*days*mult,total=accommodation+transport+activities+food;document.getElementById('costs').innerHTML=`<div class="cost"><small>Accommodation</small><strong>${money(accommodation)}</strong></div><div class="cost"><small>Transport</small><strong>${money(transport)}</strong></div><div class="cost"><small>Activities</small><strong>${money(activities)}</strong></div><div class="cost"><small>Food</small><strong>${money(food)}</strong></div><div class="cost total"><small>Estimated total</small><strong>${money(total)}</strong></div>`}
+generate();
+</script></body></html>
