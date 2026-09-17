@@ -1,4 +1,4 @@
-name: Deploy TanzaniaTrip to InfinityFree
+name: Deploy TanzaniaTrip to shizer.kesug.com
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Deploy via FTP
+      - name: Deploy to shizer.kesug.com/htdocs
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftpupload.net
           username: ${{ secrets.INFINITYFREE_FTP_USERNAME }}
           password: ${{ secrets.INFINITYFREE_FTP_PASSWORD }}
-          server-dir: /htdocs/
+          server-dir: /shizer.kesug.com/htdocs/
           protocol: ftp
           port: 21
           dangerous-clean-slate: false
