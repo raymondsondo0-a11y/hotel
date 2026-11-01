@@ -257,6 +257,7 @@ try{
 state.images=[];const tasks=state.activities.slice(0,24),groups=tasks.length>12?tasks.slice(0,11).concat(["Additional documented activities: "+tasks.slice(11).join("; ")]):tasks;
 for(let i=0;i<groups.length;i++){const q=imageQueryFor(groups[i]);const im=await sourceImage(q);state.images.push(im);$("reportStats").textContent="Searching online illustrations: "+(i+1)+" of "+groups.length+" topics…";}
 $("report").innerHTML=makeReport();
+const roman=["i","ii","iii","iv","v","vi","vii","viii","ix","x"];document.querySelectorAll("#report .report-page").forEach((pg,i)=>{const pn=pg.querySelector(".page-number");if(pn)pn.textContent=i===0?"":(i<=5?roman[i-1]:String(i-5));});
 const words=$("report").innerText.trim().split(/\s+/).length;const pageCount=document.querySelectorAll("#report .report-page").length;
 $("reportStats").innerHTML='<b>Report prepared:</b> '+pageCount+' designed report pages · '+words.toLocaleString()+' words · '+state.activities.length+' activity statements identified · '+state.images.filter(Boolean).length+' relevant online images attached. <span class="text-secondary">The final printed pagination may vary slightly by browser and printer settings.</span>';
 window.scrollTo({top:0,behavior:"smooth"});
