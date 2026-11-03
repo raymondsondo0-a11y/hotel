@@ -167,6 +167,43 @@ body{background:var(--rr-paper);color:var(--rr-ink);font-family:Arial,"Helvetica
 .footer{color:#737b72;padding-top:24px;padding-bottom:24px;font-size:.75rem;border-top:1px solid #d5d6ca;margin-top:34px}
 @media(max-width:991px){.hero{padding:50px 0 75px;min-height:390px}.hero-index{margin-top:12px}}
 @media(max-width:575px){.hero{padding:39px 0 58px;min-height:360px}.hero h1{letter-spacing:-1px}.workspace{margin-top:-20px}.main{padding:20px 15px}.hero-shade{background:linear-gradient(90deg,rgba(22,42,39,.91),rgba(22,42,39,.74))}.hero-copy{padding-right:12px}}
+
+/* Final visual refinement: open layout, softer surfaces, no visible scrollbars */
+html,body{scrollbar-width:none!important;-ms-overflow-style:none!important}
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
+body{background:#e8e2d5!important;color:#263a32!important}
+:root{--bs-body-bg:#e8e2d5;--bs-body-color:#263a32;--bs-primary:#315747;--bs-success:#315747;--bs-border-color:#c9c1b2}
+main,.main,.workspace,.app-shell,.page-shell,.wrap{scrollbar-width:none!important}
+.card,.panel,.step-card,.feature-card,.tool-card,.workspace-card,.report-card,.result-card,.form-card,.upload-card,.info-card{
+  border-radius:0!important;box-shadow:none!important;border:0!important;
+  background:rgba(226,219,205,.72)!important;
+}
+.card-header,.card-body,.card-footer{background:transparent!important;border:0!important}
+.card-body,.panel,.step-card,.feature-card,.tool-card,.workspace-card,.report-card,.result-card,.form-card,.upload-card,.info-card{
+  padding:clamp(1rem,2.3vw,2rem)!important
+}
+section{border-radius:0!important}
+input,select,textarea,.form-control,.form-select,.btn{border-radius:3px!important}
+input,select,textarea,.form-control,.form-select{
+  background-color:#f0eadf!important;border-color:#c8c0b2!important;color:#263a32!important
+}
+label,.form-label{color:#34483e!important}
+.navbar,.site-nav,header:not(.hero){background:#e8e2d5!important}
+.hero{background-color:#b9b8a8!important}
+.hero .wrap{position:relative;z-index:1}
+.hero-shade{background:linear-gradient(90deg,rgba(24,43,35,.77),rgba(24,43,35,.34))!important}
+.hero h1,.hero h2,.hero p,.hero .eyebrow{color:#fffaf0}
+.container,.container-fluid{--bs-gutter-x:clamp(1rem,3vw,2.5rem)}
+.row{--bs-gutter-y:1.25rem}
+hr,.border,.border-bottom,.border-top{border-color:rgba(65,79,65,.2)!important}
+.btn-primary,.btn-success{background:#315747!important;border-color:#315747!important}
+.btn-outline-primary,.btn-outline-success{color:#315747!important;border-color:#6d8877!important}
+.btn-outline-primary:hover,.btn-outline-success:hover{background:#315747!important;color:#fffaf0!important}
+@media(max-width:767px){
+  .hero{padding-top:3rem!important;padding-bottom:3rem!important}
+  .card-body,.panel,.step-card,.feature-card,.tool-card,.workspace-card,.report-card,.result-card,.form-card,.upload-card,.info-card{padding:1rem!important}
+}
+
 </style>
 </head>
 <body>
