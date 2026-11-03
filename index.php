@@ -37,11 +37,65 @@ html,body{background:#fff!important;margin:0!important;padding:0!important}
 .report-page{width:210mm;height:297mm;min-height:297mm;max-height:297mm;margin:0!important;padding:25mm 25mm 25mm 38mm;overflow:hidden;break-after:page;page-break-after:always;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 .report-page:last-child{break-after:auto;page-break-after:auto}
 }
+
+/* Distinctive editorial studio visual system */
+:root{--navy:#172b35;--blue:#a94f32;--cyan:#c7d8cb;--ink:#202b2b;--muted:#68716b;--line:#d8d8cd;--soft:#f4f1e8;--green:#376b58}
+html{scroll-behavior:smooth}
+body{background:#f1efe7;color:#202b2b;font-family:Inter,"Aptos","Segoe UI",Arial,sans-serif;font-size:15px}
+.topbar{background:#172b35;padding:12px 0;box-shadow:none;border-bottom:3px solid #b96848}
+.brand{font-size:1rem;letter-spacing:1.1px;text-transform:uppercase}
+.brand-icon{width:35px;height:35px;border-radius:5px;background:#b96848;margin-right:11px}
+.hero{min-height:400px;padding:68px 0 78px;background:#172b35!important;align-items:center}
+.hero:before,.hero:after{display:none!important}
+.hero-slideshow{position:absolute;inset:0;z-index:0;overflow:hidden;background:#172b35;pointer-events:none}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 43%;opacity:0;transition:opacity 1.8s ease-in-out;transform:scale(1.025);will-change:opacity}
+.hero-photo.is-active{opacity:1}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,31,37,.88) 0%,rgba(15,31,37,.69) 48%,rgba(15,31,37,.22) 100%),linear-gradient(0deg,rgba(15,31,37,.28),transparent 65%)}
+.hero>.wrap{position:relative;z-index:1}
+.hero-kicker{background:#f3e9db;color:#783f2b;border-radius:3px;padding:8px 12px;font-size:.72rem;letter-spacing:1.2px}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.4rem,5vw,4.3rem);font-weight:700;letter-spacing:-1.5px;line-height:1.04;max-width:800px}
+.hero h1 span{color:#e8b89c!important}
+.hero p{max-width:690px;color:#f0eee7;font-size:1.04rem;line-height:1.8}
+.workspace{margin-top:-30px}
+.cardx{border:1px solid #d8d8cd;border-radius:8px;box-shadow:0 8px 24px rgba(31,42,38,.07)}
+.side{padding:20px;background:#fbfaf5}
+.step{border-radius:5px;padding:12px 10px;color:#6d766f}
+.step .num{border-radius:4px;background:#e8e7de;color:#59645d}
+.step.active{background:#e9eee7;color:#234a3b;border-left:3px solid #b96848}
+.step.active .num{background:#234a3b;color:#fff}
+.step.done .num{border-radius:4px;background:#dfece3}
+.main{padding:clamp(20px,3vw,38px);background:#fffefa;min-height:660px}
+.eyebrow{border-radius:3px;background:#e9eee7;color:#234a3b;padding:7px 10px;font-size:.7rem;letter-spacing:1px}
+.title{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:-.45px;color:#202b2b}
+.sub{color:#68716b;line-height:1.75}
+.form-label{font-size:.84rem;font-weight:750;color:#34433d}
+.form-control,.form-select{border:1px solid #d2d5ca;border-radius:5px;padding:12px 13px;background:#fffefa}
+.form-control:focus,.form-select:focus{border-color:#b96848;box-shadow:0 0 0 .18rem rgba(185,104,72,.13)}
+.upload-box{border:1px dashed #aab5a8;background:#f8f7f0;border-radius:6px;padding:25px}
+.upload-box:hover,.upload-box.ready{border-color:#b96848;background:#f8eee6}
+.upload-box .big{color:#a94f32}
+.file-row{border-radius:5px;border-color:#deded4;background:#fffefa}
+.btn{border-radius:5px;font-weight:750;padding:11px 17px;letter-spacing:.1px}
+.btn-primary{background:#a94f32;border-color:#a94f32}
+.btn-primary:hover,.btn-primary:focus{background:#873d28;border-color:#873d28}
+.btn-success{background:#376b58;border-color:#376b58}
+.btn-outline-secondary{border-color:#aeb6ad;color:#435047}
+.info{background:#eef2ea;border:1px solid #d8e2d3;color:#3c5648;border-radius:5px;line-height:1.6}
+.warn{background:#fbf0e5;border:1px solid #ead2bc;color:#794a2c;border-radius:5px;line-height:1.6}
+.progress{height:7px;border-radius:2px;background:#e4e4da}
+.progress-bar{background:#a94f32}
+.previewbox{background:#f6f4ec;border:1px solid #deded4;border-radius:5px}
+.activity-chip{border-radius:3px;background:#e9eee7;color:#234a3b}
+.report-shell{background:#e6e4da;border-radius:5px}
+.report-paper{box-shadow:0 4px 18px rgba(28,38,33,.15)}
+.footer{color:#777f75}
+@media(max-width:991px){.hero{padding:48px 0 56px;min-height:340px}}
+@media(max-width:575px){.hero{padding:38px 0 46px;min-height:330px}.hero h1{letter-spacing:-.8px}.workspace{margin-top:-15px}.main{padding:19px 15px}.hero-shade{background:linear-gradient(90deg,rgba(15,31,37,.82),rgba(15,31,37,.45))}}
 </style>
 </head>
 <body>
 <nav class="topbar"><div class="wrap d-flex justify-content-between align-items-center"><a class="brand" href="#"><span class="brand-icon"><i class="bi bi-journal-richtext"></i></span>RAYMOND <span style="color:#70e0e1">REPORT STUDIO</span></a><span class="small text-white-50 d-none d-md-inline">Reference-led academic report builder</span></div></nav>
-<header class="hero"><div class="wrap"><span class="eyebrow" style="background:#ffffff22;color:#e6ffff">DOCUMENT-BASED REPORT CREATION</span><h1 class="mt-3">Your documents.<br><span style="color:#79e4e3">A complete report.</span></h1><p class="mt-3 mb-0">Upload two completed reports to learn the required structure and writing style, then upload the activity-review requirements that provide the real content. Relevant online images are found and placed beside the topics they illustrate.</p></div></header>
+<header class="hero"><div class="hero-slideshow" aria-hidden="true"><img class="hero-photo is-active" alt="" src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2000&q=85"><img class="hero-photo" alt="" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85"><span class="hero-shade"></span></div><div class="wrap"><span class="eyebrow hero-kicker">RAYMOND REPORT STUDIO · DOCUMENT WORKSPACE</span><h1 class="mt-3">Your documents.<br><span style="color:#79e4e3">A complete report.</span></h1><p class="mt-3 mb-0">Upload two completed reports to learn the required structure and writing style, then upload the activity-review requirements that provide the real content. Relevant online images are found and placed beside the topics they illustrate.</p></div></header>
 <div class="wrap workspace"><div class="row g-3">
 <aside class="col-lg-3"><div class="cardx side"><div class="text-uppercase fw-bold small text-secondary mb-3" style="letter-spacing:1px">Creation process</div>
 <div class="step active" data-step="1"><span class="num">1</span><span>Reference reports</span></div><div class="step" data-step="2"><span class="num">2</span><span>Activities & requirements</span></div><div class="step" data-step="3"><span class="num">3</span><span>Report details</span></div><div class="step" data-step="4"><span class="num">4</span><span>Analyse & research images</span></div><div class="step" data-step="5"><span class="num">5</span><span>Complete report</span></div>
@@ -350,38 +404,57 @@ const blob=await D.Packer.toBlob(doc);saveBlob(blob,"Raymond-Industrial-Training
 finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-word me-1"></i>Download Word (.docx)';}
 };
 
-/* Raymond Report Studio hero slideshow: visible fallback + smooth, non-skipping 3-second rotation. */
+/* Raymond Report Studio photo rotation: real image layers, preload-before-fade, skip failed URLs. */
 (function(){
   const hero=document.querySelector(".hero");
-  if(!hero)return;
+  const stage=hero&&hero.querySelector(".hero-slideshow");
+  if(!hero||!stage)return;
+  const layers=Array.from(stage.querySelectorAll(".hero-photo"));
+  if(layers.length<2)return;
   const photos=[
     "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2000&q=85",
     "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85",
     "https://images.unsplash.com/photo-1627556704302-624286467c65?auto=format&fit=crop&w=2000&q=85",
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=2000&q=85",
     "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=2000&q=85"
+    "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=2000&q=85",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=2000&q=85"
   ];
-  let index=0,showB=false;
-  hero.style.setProperty("--grad-photo-a",'url("'+photos[0]+'")');
-  hero.style.setProperty("--grad-photo-b",'url("'+photos[1]+'")');
+  let index=0,front=0;
+  layers[0].classList.add("is-active");
+  layers[1].classList.remove("is-active");
   function rotate(){
-    const nextIndex=(index+1)%photos.length;
-    const preload=new Image();
-    preload.onload=function(){
-      if(showB){hero.style.setProperty("--grad-photo-a",'url("'+photos[nextIndex]+'")');hero.classList.remove("photo-b");}
-      else{hero.style.setProperty("--grad-photo-b",'url("'+photos[nextIndex]+'")');hero.classList.add("photo-b");}
-      index=nextIndex;showB=!showB;
-      window.setTimeout(rotate,3000);
-    };
-    preload.onerror=function(){index=nextIndex;window.setTimeout(rotate,700);};
-    preload.src=photos[nextIndex];
+    let tries=0;
+    function attempt(){
+      const next=(index+1)%photos.length;
+      if(tries>=photos.length){window.setTimeout(rotate,3000);return;}
+      const preload=new Image();
+      preload.onload=function(){
+        const back=1-front;
+        layers[back].src=photos[next];
+        layers[back].onload=null;
+        requestAnimationFrame(function(){
+          layers[back].classList.add("is-active");
+          layers[front].classList.remove("is-active");
+          front=back;index=next;
+          window.setTimeout(rotate,3000);
+        });
+      };
+      preload.onerror=function(){index=next;tries++;attempt();};
+      preload.src=photos[next];
+    }
+    attempt();
   }
-  photos.slice(0,2).forEach(function(src){const img=new Image();img.src=src;});
+  layers.forEach(function(layer){layer.loading="eager";layer.decoding="async";});
   window.setTimeout(rotate,3000);
 })();
-
-$("startOver").onclick=()=>{if(!confirm("Start a new report? The current report will be cleared."))return;location.reload();};
+ 
+$("startOver").onclick=$("startOver").onclick=()=>{if(!confirm("Start a new report? The current report will be cleared."))return;location.reload();};
 })();
 </script>
 </body>
