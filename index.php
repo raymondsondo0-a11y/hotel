@@ -454,7 +454,7 @@ finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-word me-1
   window.setTimeout(rotate,3000);
 })();
  
-$("startOver").onclick=$("startOver").onclick=()=>{if(!confirm("Start a new report? The current report will be cleared."))return;location.reload();};
+$("startOver").onclick=()=>{if(!confirm("Start a new report? The current report will be cleared."))return;location.reload();};
 })();
 </script>
 </body>
