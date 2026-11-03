@@ -239,6 +239,28 @@ hr,.border,.border-bottom,.border-top{border-color:rgba(65,79,65,.2)!important}
 @media(max-width:991px){.side{padding:22px!important;position:static!important}}
 @media(prefers-reduced-motion:reduce){.side .step{transition:none}}
 
+
+/* PURE GLASS MATERIAL — Creation process panel and step controls */
+aside .cardx.side{
+  position:sticky!important;top:16px!important;padding:30px 26px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.035) 52%,rgba(255,255,255,.09))!important;
+  border:1px solid rgba(255,255,255,.68)!important;border-radius:8px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72),inset 1px 0 0 rgba(255,255,255,.22),0 18px 48px rgba(25,45,35,.12)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(180%)!important;backdrop-filter:blur(24px) saturate(180%)!important;
+  overflow:hidden!important;position:sticky!important;
+}
+aside .cardx.side:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(125deg,rgba(255,255,255,.16),transparent 34%,transparent 72%,rgba(255,255,255,.07))}
+aside .cardx.side>*{position:relative;z-index:1}
+aside .cardx.side>.text-uppercase{padding:0 0 17px!important;margin:0 0 14px!important;color:#243d31!important;font-size:.72rem!important;letter-spacing:2px!important;border-bottom:1px solid rgba(255,255,255,.52)!important}
+aside .cardx.side .step{display:flex!important;align-items:center!important;gap:14px!important;min-height:58px!important;padding:13px 14px!important;margin:8px 0!important;color:#24392f!important;font-size:.88rem!important;font-weight:650!important;background:rgba(255,255,255,.055)!important;border:1px solid rgba(255,255,255,.38)!important;border-radius:5px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24)!important;transform:none!important;transition:background .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+aside .cardx.side .step .num{flex:0 0 34px!important;width:34px!important;height:34px!important;display:grid!important;place-items:center!important;background:rgba(255,255,255,.10)!important;color:#254a39!important;border:1px solid rgba(255,255,255,.65)!important;border-radius:50%!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)!important}
+aside .cardx.side .step.active{background:rgba(255,255,255,.20)!important;border-color:rgba(255,255,255,.82)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 5px 18px rgba(35,60,46,.07)!important}
+aside .cardx.side .step:hover{background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.72)!important}
+aside .cardx.side hr{border-color:rgba(255,255,255,.55)!important;opacity:1!important;margin:22px 0!important}
+aside .cardx.side .small{color:#34483d!important;line-height:1.65!important}
+@media(max-width:991px){aside .cardx.side{position:relative!important;top:auto!important;padding:22px 18px!important}}
+@media(prefers-reduced-motion:reduce){aside .cardx.side .step{transition:none!important}}
+
 </style>
 </head>
 <body>
