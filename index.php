@@ -204,6 +204,41 @@ hr,.border,.border-bottom,.border-top{border-color:rgba(65,79,65,.2)!important}
   .card-body,.panel,.step-card,.feature-card,.tool-card,.workspace-card,.report-card,.result-card,.form-card,.upload-card,.info-card{padding:1rem!important}
 }
 
+
+/* Creation process: generously padded, clear glass panel */
+.side{
+  padding:clamp(24px,3vw,36px)!important;
+  background:rgba(246,242,232,.16)!important;
+  border:1px solid rgba(255,255,255,.52)!important;
+  border-radius:4px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 18px 48px rgba(31,49,39,.10)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(145%)!important;
+  backdrop-filter:blur(18px) saturate(145%)!important;
+}
+.side>.text-uppercase{margin-bottom:22px!important;color:#263a32!important;letter-spacing:1.8px!important;font-size:.72rem!important}
+.side .step{
+  padding:14px 12px!important;
+  margin:7px 0!important;
+  gap:13px!important;
+  background:rgba(255,255,255,.19)!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  border-radius:3px!important;
+  color:#263a32!important;
+  transition:background .25s ease,border-color .25s ease,transform .25s ease;
+}
+.side .step .num{
+  flex:0 0 32px!important;width:32px!important;height:32px!important;
+  border:1px solid rgba(49,87,71,.30)!important;
+  background:rgba(255,255,255,.30)!important;color:#315747!important;
+}
+.side .step.active,.side .step.current,.side .step:focus-within{
+  background:rgba(255,255,255,.40)!important;
+  border-color:rgba(255,255,255,.72)!important;
+}
+.side .step:hover{background:rgba(255,255,255,.35)!important;transform:translateX(2px)}
+@media(max-width:991px){.side{padding:22px!important;position:static!important}}
+@media(prefers-reduced-motion:reduce){.side .step{transition:none}}
+
 </style>
 </head>
 <body>
