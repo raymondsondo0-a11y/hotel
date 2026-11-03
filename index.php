@@ -91,11 +91,87 @@ body{background:#f1efe7;color:#202b2b;font-family:Inter,"Aptos","Segoe UI",Arial
 .footer{color:#777f75}
 @media(max-width:991px){.hero{padding:48px 0 56px;min-height:340px}}
 @media(max-width:575px){.hero{padding:38px 0 46px;min-height:330px}.hero h1{letter-spacing:-.8px}.workspace{margin-top:-15px}.main{padding:19px 15px}.hero-shade{background:linear-gradient(90deg,rgba(15,31,37,.82),rgba(15,31,37,.45))}}
+
+/* Bootstrap-based bespoke editorial redesign */
+:root{--bs-primary:#a64e32;--bs-primary-rgb:166,78,50;--bs-success:#386b57;--bs-success-rgb:56,107,87;--rr-ink:#202b29;--rr-muted:#6c746e;--rr-paper:#f0eee6;--rr-line:#d8d8ce}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{background:var(--rr-paper);color:var(--rr-ink);font-family:Arial,"Helvetica Neue",sans-serif;font-size:15px;letter-spacing:.01em}
+.topbar{position:relative;background:#1e302e;color:#fff;padding:15px 0;border-bottom:4px solid #b56b4d;box-shadow:none}
+.brand{display:flex;align-items:center;gap:12px;color:#fff!important}
+.brand-icon{display:inline-grid;place-items:center;width:39px;height:39px;border-radius:4px;background:#b56b4d;color:#fff;margin:0;font-size:1.2rem}
+.brand-word{font-size:.88rem;font-weight:800;letter-spacing:1.1px;line-height:1.2}
+.brand-word span{display:block;color:#d6b59f;font-size:.68rem;letter-spacing:2px;margin-top:4px}
+.nav-meta{font-size:.65rem;letter-spacing:1.4px;color:#c9d0c9;font-weight:700}
+.nav-meta a{color:#f3e6d9;text-decoration:none;font-size:.72rem;letter-spacing:.4px;border-bottom:1px solid #b56b4d;padding-bottom:4px}
+.nav-dot{width:7px;height:7px;background:#d1a88d;border-radius:50%}
+.nav-divider{height:24px;border-left:1px solid #52605b}
+.hero{min-height:490px;padding:65px 0 94px;background:#1e302e!important;color:#fff;align-items:center}
+.hero:before,.hero:after{display:none!important}
+.hero-slideshow{position:absolute;inset:0;z-index:0;overflow:hidden;background:#1e302e;pointer-events:none}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;opacity:0;transition:opacity 1.8s ease-in-out;transform:scale(1.02);will-change:opacity}
+.hero-photo.is-active{opacity:1}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(22,42,39,.94) 0%,rgba(22,42,39,.85) 45%,rgba(22,42,39,.52) 100%),linear-gradient(0deg,rgba(22,42,39,.36),transparent 70%)}
+.hero>.wrap{position:relative;z-index:1}
+.hero-kicker{display:flex;align-items:center;gap:10px;background:none;color:#e7c2a9;border-radius:0;padding:0;font-size:.69rem;font-weight:800;letter-spacing:2px}
+.hero-kicker-line{width:34px;height:2px;background:#c07a59;display:inline-block}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.65rem,5vw,4.8rem);font-weight:500;letter-spacing:-1.9px;line-height:1.03;max-width:800px;margin-bottom:0}
+.hero h1 em{font-weight:400;color:#e0b59a}
+.hero p{max-width:640px;color:#e1e6df;font-size:1rem;line-height:1.85}
+.btn-hero-primary{background:#c17a59;color:#fff;border:1px solid #c17a59;border-radius:3px;padding:13px 19px;font-size:.84rem}
+.btn-hero-primary:hover{background:#a65e40;color:#fff;border-color:#a65e40}
+.hero-note{font-size:.76rem;color:#e0e4dc}
+.hero-index{background:rgba(24,43,40,.72);border:1px solid rgba(237,225,207,.36);padding:21px 22px 15px;backdrop-filter:none;box-shadow:10px 10px 0 rgba(191,122,89,.26)}
+.hero-index-head,.hero-index-foot{display:flex;justify-content:space-between;align-items:center;font-size:.63rem;letter-spacing:1.4px;color:#d2b9a5;font-weight:800}
+.hero-index-head{padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.18)}
+.hero-index-title{font-family:Georgia,"Times New Roman",serif;font-size:1.9rem;line-height:1.06;padding:18px 0;color:#fff}
+.hero-index-list>div{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12);font-size:.75rem}
+.hero-index-list>div span{font-size:.67rem;color:#d8a58a;font-weight:800}
+.hero-index-list>div b{font-weight:600;flex:1;color:#edf0e9}
+.hero-index-list>div i{color:#d8a58a}
+.hero-index-foot{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);font-size:.55rem;color:#bfc9bf}
+.workspace{margin-top:-34px;position:relative;z-index:2}
+.cardx{background:#fffef9;border:1px solid var(--rr-line);border-radius:4px;box-shadow:0 10px 28px rgba(32,43,41,.065)}
+.side{padding:22px 18px;position:sticky;top:12px;background:#e6e7dc;border-color:#d4d6ca}
+.side>.text-uppercase{color:#53605a!important;font-size:.65rem!important;letter-spacing:1.6px!important}
+.step{display:flex;align-items:center;gap:10px;padding:12px 9px;border-radius:3px;font-size:.82rem;font-weight:700;color:#6b756e;border-left:3px solid transparent}
+.step .num{width:27px;height:27px;border-radius:3px;display:grid;place-items:center;background:#d4d9cf;color:#58635c;flex-shrink:0;font-size:.72rem}
+.step.active{background:#f8f6ed;color:#294c3f;border-left-color:#b56b4d}
+.step.active .num{background:#294c3f;color:#fff}
+.step.done{color:#386b57}
+.step.done .num{background:#d3e3d6;color:#386b57}
+.main{padding:clamp(20px,3vw,39px);min-height:660px;background:#fffef9}
+.eyebrow{display:inline-block;background:#e9ece3;color:#355744;border-left:3px solid #b56b4d;border-radius:0;padding:7px 10px;font-size:.66rem;font-weight:850;letter-spacing:1.2px}
+.title{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:-.55px;color:#202b29;font-size:clamp(1.6rem,2.8vw,2.1rem)}
+.sub{color:#6c746e;line-height:1.8;max-width:850px}
+.form-label{font-size:.81rem;font-weight:800;color:#394a42}
+.form-control,.form-select{border:1px solid #d1d5ca;border-radius:3px;padding:12px 13px;background:#fffefb;color:#202b29}
+.form-control:focus,.form-select:focus{border-color:#b56b4d;box-shadow:0 0 0 .17rem rgba(181,107,77,.14)}
+.upload-box{border:1px dashed #a8b3a6;background:#f7f6ef;border-radius:3px;padding:24px;text-align:left;transition:background .2s,border-color .2s}
+.upload-box:hover,.upload-box.ready{border-color:#b56b4d;background:#f5ebe3}
+.upload-box .big{font-size:2rem;color:#a64e32}
+.upload-box h5{font-family:Georgia,"Times New Roman",serif;font-size:1.2rem}
+.btn{border-radius:3px;font-weight:750;padding:10px 16px;font-size:.84rem}
+.btn-primary{background:#a64e32;border-color:#a64e32}
+.btn-primary:hover,.btn-primary:focus{background:#843b27;border-color:#843b27}
+.btn-success{background:#386b57;border-color:#386b57}
+.btn-outline-secondary{border-color:#adb5aa;color:#435047}
+.info,.warn{border-radius:3px;padding:13px 15px;line-height:1.7;font-size:.85rem}
+.info{background:#edf1e9;border:1px solid #d8e2d3;color:#3c5648}
+.warn{background:#fbf0e5;border:1px solid #ead2bc;color:#794a2c}
+.progress{height:6px;border-radius:0;background:#e4e4da}
+.progress-bar{background:#a64e32}
+.previewbox{background:#f5f3eb;border:1px solid #deded4;border-radius:3px}
+.activity-chip{border-radius:2px;background:#e6ece2;color:#294c3f}
+.report-shell{background:#deded5;border-radius:3px}
+.report-paper{box-shadow:0 4px 18px rgba(28,38,33,.15)}
+.footer{color:#737b72;padding-top:24px;padding-bottom:24px;font-size:.75rem;border-top:1px solid #d5d6ca;margin-top:34px}
+@media(max-width:991px){.hero{padding:50px 0 75px;min-height:390px}.hero-index{margin-top:12px}}
+@media(max-width:575px){.hero{padding:39px 0 58px;min-height:360px}.hero h1{letter-spacing:-1px}.workspace{margin-top:-20px}.main{padding:20px 15px}.hero-shade{background:linear-gradient(90deg,rgba(22,42,39,.91),rgba(22,42,39,.74))}.hero-copy{padding-right:12px}}
 </style>
 </head>
 <body>
-<nav class="topbar"><div class="wrap d-flex justify-content-between align-items-center"><a class="brand" href="#"><span class="brand-icon"><i class="bi bi-journal-richtext"></i></span>RAYMOND <span style="color:#70e0e1">REPORT STUDIO</span></a><span class="small text-white-50 d-none d-md-inline">Reference-led academic report builder</span></div></nav>
-<header class="hero"><div class="hero-slideshow" aria-hidden="true"><img class="hero-photo is-active" alt="" src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2000&q=85"><img class="hero-photo" alt="" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85"><span class="hero-shade"></span></div><div class="wrap"><span class="eyebrow hero-kicker">RAYMOND REPORT STUDIO · DOCUMENT WORKSPACE</span><h1 class="mt-3">Your documents.<br><span style="color:#79e4e3">A complete report.</span></h1><p class="mt-3 mb-0">Upload two completed reports to learn the required structure and writing style, then upload the activity-review requirements that provide the real content. Relevant online images are found and placed beside the topics they illustrate.</p></div></header>
+<nav class="topbar navbar navbar-expand-lg"><div class="wrap container-fluid px-0"><a class="brand navbar-brand m-0" href="#"><span class="brand-icon"><i class="bi bi-journal-richtext"></i></span><span class="brand-word">RAYMOND <span>REPORT STUDIO</span></span></a><div class="nav-meta d-none d-md-flex align-items-center gap-3"><span class="nav-dot"></span><span>DOCUMENT PRODUCTION WORKSPACE</span><span class="nav-divider"></span><a href="#step1">Start a report <i class="bi bi-arrow-up-right"></i></a></div></div></nav>
+<header class="hero"><div class="hero-slideshow" aria-hidden="true"><img class="hero-photo is-active" alt="" src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2000&q=85"><img class="hero-photo" alt="" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85"><span class="hero-shade"></span></div><div class="wrap container-fluid px-0"><div class="row align-items-center g-5"><div class="col-lg-8 hero-copy"><div class="hero-kicker"><span class="hero-kicker-line"></span> A BETTER WAY TO BUILD REPORTS</div><h1 class="mt-4">Turn your fieldwork<br>into a <em>proper report.</em></h1><p class="mt-4 mb-4">A practical workspace for industrial training and academic reports. Bring your own reference documents, describe the work you completed, and organise the evidence into a report you can review, download and print.</p><div class="hero-actions d-flex flex-wrap align-items-center gap-3"><a class="btn btn-hero-primary" href="#step1">Build a report <i class="bi bi-arrow-down-right ms-2"></i></a><span class="hero-note"><i class="bi bi-shield-check me-2"></i>Files stay in your browser</span></div></div><div class="col-lg-4 d-none d-lg-block"><div class="hero-index"><div class="hero-index-head"><span>WORKFLOW / 01—05</span><i class="bi bi-arrow-up-right"></i></div><div class="hero-index-title">From source<br>to submission.</div><div class="hero-index-list"><div><span>01</span><b>Reference format</b><i class="bi bi-check2"></i></div><div><span>02</span><b>Activities & evidence</b><i class="bi bi-check2"></i></div><div><span>03</span><b>Report details</b><i class="bi bi-check2"></i></div><div><span>04</span><b>Images & structure</b><i class="bi bi-check2"></i></div><div><span>05</span><b>Export & print</b><i class="bi bi-arrow-up-right"></i></div></div><div class="hero-index-foot"><span>RRS</span><span>REPORT STUDIO · EST. 2026</span></div></div></div></div></div></header>
 <div class="wrap workspace"><div class="row g-3">
 <aside class="col-lg-3"><div class="cardx side"><div class="text-uppercase fw-bold small text-secondary mb-3" style="letter-spacing:1px">Creation process</div>
 <div class="step active" data-step="1"><span class="num">1</span><span>Reference reports</span></div><div class="step" data-step="2"><span class="num">2</span><span>Activities & requirements</span></div><div class="step" data-step="3"><span class="num">3</span><span>Report details</span></div><div class="step" data-step="4"><span class="num">4</span><span>Analyse & research images</span></div><div class="step" data-step="5"><span class="num">5</span><span>Complete report</span></div>
