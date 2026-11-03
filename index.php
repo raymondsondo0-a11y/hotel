@@ -374,7 +374,7 @@ finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-word me-1
       index=nextIndex;showB=!showB;
       window.setTimeout(rotate,3000);
     };
-    preload.onerror=function(){window.setTimeout(rotate,1000);};
+    preload.onerror=function(){index=nextIndex;window.setTimeout(rotate,700);};
     preload.src=photos[nextIndex];
   }
   photos.slice(0,2).forEach(function(src){const img=new Image();img.src=src;});
