@@ -393,30 +393,30 @@ for(const line of ls){if(line.length<5||line.length>105)continue;if(re.test(line
 return out.slice(0,45);
 }
 function parseLogbookActivities(text){
-const source=cleanText(text).replace(/\\s+/g," ").trim();
+const source=cleanText(text).replace(/\s+/g," ").trim();
 const found=[];
 const add=value=>{
-let v=String(value||"").replace(/^[\\s:|#-]+/,"").replace(/[\\s|]+$/,"").replace(/\\s+/g," ").trim();
-v=v.replace(/^(?:activity|work performed)\\s*[:|-]?\\s*/i,"");
+let v=String(value||"").replace(/^[\s:|#-]+/,"").replace(/[\s|]+$/,"").replace(/\s+/g," ").trim();
+v=v.replace(/^(?:activity|work performed)\s*[:|-]?\s*/i,"");
 // A table cell may contain several dated daily notes; the dated-note parser below
 // separates them into individual activities instead of treating the whole cell as one task.
-if(/\\b\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|/.test(v))return;
+if(/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\s*\(?[A-Za-z]+\)?\s*\|/.test(v))return;
 if(v.length<12||v.length>500)return;
-if(/^(?:supervisor name|signature|date|week day date|work hours|log book|page \\d+)/i.test(v))return;
+if(/^(?:supervisor name|signature|date|week day date|work hours|log book|page \d+)/i.test(v))return;
 if(!found.some(x=>x.toLowerCase()===v.toLowerCase()))found.push(v);
 };
 // Standard logbook table rows: row number, week, weekday, date, hours, activity.
-const row=/\\b\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+([\\s\\S]*?)(?=\\s+\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+|\\s+(?:Supervisor Name|LOG BOOK OF|Week Day Date|$))/gi;
+const row=/\b\d{1,2}\s+\d{1,2}\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+\d{4}[\/-]\d{1,2}[\/-]\d{1,2}\s+\d{1,2}\s+([\s\S]*?)(?=\s+\d{1,2}\s+\d{1,2}\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+\d{4}[\/-]\d{1,2}[\/-]\d{1,2}\s+\d{1,2}\s+|\s+(?:Supervisor Name|LOG BOOK OF|Week Day Date|$))/gi;
 let m;
 while((m=row.exec(source))!==null)add(m[1]);
 // Some logbooks put dated daily notes inside the activity cell, separated by pipes.
-const dated=/\\b\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|?\\s*([^|]*?)(?=\\s+\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|?|\\s+(?:Supervisor Name|LOG BOOK OF|$))/gi;
+const dated=/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\s*\(?[A-Za-z]+\)?\s*\|?\s*([^|]*?)(?=\s+\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\s*\(?[A-Za-z]+\)?\s*\|?|\s+(?:Supervisor Name|LOG BOOK OF|$))/gi;
 while((m=dated.exec(source))!==null)add(m[1]);
 // Fallback for text extractors that remove table boundaries but retain numbered entries.
 if(!found.length){
-const fragments=source.split(/(?=\\b\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-])/i);
+const fragments=source.split(/(?=\b\d{1,2}\s+\d{1,2}\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+\d{4}[\/-])/i);
 for(const part of fragments){
-const x=part.match(/^\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+(.+?)(?=\\s+(?:Supervisor Name|LOG BOOK OF)|$)/i);
+const x=part.match(/^\d{1,2}\s+\d{1,2}\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+\d{4}[\/-]\d{1,2}[\/-]\d{1,2}\s+\d{1,2}\s+(.+?)(?=\s+(?:Supervisor Name|LOG BOOK OF)|$)/i);
 if(x)add(x[1]);
 }
 }
