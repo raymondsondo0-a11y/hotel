@@ -600,7 +600,13 @@ function openPrintView(autoPrint){
   const w=window.open("","_blank");
   if(!w){$("exportStatus").textContent="Pop-up blocked. Allow pop-ups for shizer.kesug.com, then try again.";return false;}
   w.document.open();
-  w.document.write(fullHtml()+"<script>window.addEventListener('load',function(){var imgs=Array.from(document.images);Promise.all(imgs.map(function(i){return i.complete?Promise.resolve():new Promise(function(r){i.onload=i.onerror=r;});})).then(function(){if(true)setTimeout(function(){window.print();},350);});});<\\/script>");
+  w.document.write(fullHtml());
+  w.addEventListener("load",function(){
+    const imgs=Array.from(w.document.images);
+    Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;}))).then(()=>{
+      if(autoPrint)w.setTimeout(()=>{w.focus();w.print();},350);
+    });
+  },{once:true});
   w.document.close();
   return true;
 }
