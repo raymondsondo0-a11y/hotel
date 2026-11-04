@@ -348,7 +348,7 @@ async function preparePhoto(file){
   if(file.size>20*1024*1024)throw new Error(file.name+" is larger than 20 MB. Please resize it and try again.");
   const source=await readDataUrl(file);
   const img=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error("This image could not be opened: "+file.name));image.src=source;});
-  const maxSide=2000,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+  const maxSide=1800,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
   const canvas=document.createElement("canvas");
   canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
   canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
@@ -356,7 +356,7 @@ async function preparePhoto(file){
   if(!ctx)throw new Error("Your browser could not process "+file.name);
   ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.86),caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")};
+  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.80),caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")};
 }
 $("workPhotos").addEventListener("change",async e=>{
   const files=Array.from(e.target.files||[]);
@@ -367,10 +367,10 @@ $("workPhotos").addEventListener("change",async e=>{
   $("photoList").innerHTML='<div class="col-12 small text-primary">Preparing '+pending.length+' selected photo(s)…</div>';
   for(let i=0;i<pending.length;i++){
     const file=pending[i];
-    if(state.userImages.length>=40){errors.push("Maximum of 40 photos per report reached.");break;}
+    if(state.userImages.length>=150){errors.push("Maximum of 150 photos per report reached. Please split the evidence into separate reports.");break;}
     try{
       const photo=await preparePhoto(file);
-      state.userImages.push(photo);added++;
+      state.userImages.push(photo);existing.add(file.name+"|"+file.size);added++;
       $("photoList").innerHTML='<div class="col-12 small text-primary">Loaded '+(i+1)+' of '+pending.length+' selected photos…</div>';
     }catch(err){errors.push(err.message);}
   }
@@ -611,52 +611,124 @@ $("downloadHtml").onclick=()=>{try{saveBlob(new Blob([fullHtml()],{type:"applica
 $("printReport").onclick=()=>{const w=window.open("","_blank");if(!w){$("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com, or use Download PDF.";return;}w.document.open();w.document.write(fullHtml()+"<script>window.onload=function(){setTimeout(function(){window.print()},1000)};<\/script>");w.document.close();};
 $("downloadPdf").onclick=async()=>{const btn=$("downloadPdf");if(!window.html2pdf){$("exportStatus").textContent="PDF library did not load. Check your internet connection, reload the page and try again.";return;}btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating PDF…';$("exportStatus").textContent="Preparing report pages for PDF download…";try{await window.html2pdf().set({margin:0,filename:"Raymond-Industrial-Training-Report.pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:1.5,useCORS:true,allowTaint:false,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from($("report")).save();$("exportStatus").textContent="PDF export completed. Check your Downloads folder.";}catch(e){console.error(e);$("exportStatus").textContent="PDF export failed: "+e.message+". Use Print / Save PDF as an alternative.";}finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-pdf me-1"></i>Download PDF';}};
 $("downloadDocx").onclick=async()=>{
-async function ensureDocxLibrary(){
-  if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
-  const urls=["https://cdn.jsdelivr.net/npm/docx@8.5.2/build/index.umd.js","https://unpkg.com/docx@8.5.2/build/index.umd.js"];
-  for(const src of urls){
-    try{
-      await new Promise((resolve,reject)=>{
-        const script=document.createElement("script");script.src=src;script.async=true;
-        script.onload=resolve;script.onerror=()=>reject(new Error("Could not load "+src));
-        document.head.appendChild(script);
-      });
-      if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
-    }catch(err){console.warn(err);}
+  const btn=$("downloadDocx");
+  const original=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Preparing Word report…';
+  $("exportStatus").textContent="Preparing the complete report and all uploaded evidence photographs for Microsoft Word…";
+  function downloadWordCompatibleCopy(reason){
+    const blob=new Blob(["\ufeff",fullHtml()],{type:"application/msword;charset=utf-8"});
+    saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
+    $("exportStatus").textContent="A Word-compatible .doc file containing the full report and uploaded evidence has been downloaded. "+reason;
   }
-  throw new Error("Word export library could not be loaded. Check your internet connection or browser content blockers.");
-}
-const btn=$("downloadDocx");btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating Word document…';
-try{
-const D=await ensureDocxLibrary(),children=[];await document.fonts.ready;
-const sections=Array.from($("report").querySelectorAll(".report-page"));
-for(let pi=0;pi<sections.length;pi++){
-const sheet=sections[pi];
-for(const node of Array.from(sheet.children)){
-if(node.classList&&node.classList.contains("page-number"))continue;
-if(node.tagName==="H1"||node.tagName==="H2"||node.tagName==="H3"){
-children.push(new D.Paragraph({text:node.innerText,heading:node.tagName==="H1"?D.HeadingLevel.TITLE:node.tagName==="H2"?D.HeadingLevel.HEADING_1:D.HeadingLevel.HEADING_2,alignment:node.tagName==="H1"?D.AlignmentType.CENTER:D.AlignmentType.LEFT,spacing:{after:180}}));
-}else if(node.tagName==="P"){
-children.push(new D.Paragraph({children:[new D.TextRun({text:node.innerText})],alignment:D.AlignmentType.JUSTIFIED,spacing:{after:130,line:360}}));
-}else if(node.tagName==="OL"||node.tagName==="UL"){
-let listIndex=0;for(const li of Array.from(node.querySelectorAll(":scope > li"))){listIndex++;children.push(new D.Paragraph({text:(node.tagName==="OL"?listIndex+". ":"")+li.innerText,bullet:node.tagName==="UL"?{indent:360}:undefined,spacing:{after:80}}));}
-}else if(node.tagName==="TABLE"){
-for(const tr of Array.from(node.rows)){const cells=Array.from(tr.cells).map(td=>new D.TableCell({children:[new D.Paragraph({text:td.innerText})],width:{size:100/Math.max(1,tr.cells.length),type:D.WidthType.PERCENTAGE}}));children.push(new D.Table({rows:[new D.TableRow({children:cells})],width:{size:100,type:D.WidthType.PERCENTAGE}}));}
-}else if(node.tagName==="FIGURE"){
-const img=node.querySelector("img");if(img){try{let data;if(img.src.startsWith("data:")){const raw=atob(img.src.split(",")[1]);data=Uint8Array.from(raw,c=>c.charCodeAt(0));}else{const response=await fetch(img.src,{mode:"cors"});if(!response.ok)throw new Error("Image download failed");data=new Uint8Array(await response.arrayBuffer());}const mime=img.src.startsWith("data:image/png")?"png":"jpg";children.push(new D.Paragraph({children:[new D.ImageRun({data,transformation:{width:430,height:260},type:mime})],alignment:D.AlignmentType.CENTER}));}catch(e){children.push(new D.Paragraph({text:"[Online illustration: "+(img.alt||"topic image")+"]"}));}}
-const cap=node.querySelector("figcaption");if(cap)children.push(new D.Paragraph({text:cap.innerText,alignment:D.AlignmentType.CENTER,spacing:{after:160}}));
-}else if(node.tagName==="DIV"){
-for(const pnode of Array.from(node.querySelectorAll("p"))){children.push(new D.Paragraph({text:pnode.innerText,alignment:D.AlignmentType.CENTER,spacing:{after:110}}));}
-}
-}
-if(pi<sections.length-1)children.push(new D.Paragraph({children:[new D.PageBreak()]}));
-}
-const doc=new D.Document({sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1417,right:1247,bottom:1417,left:2154}}},children}]});
-const blob=await D.Packer.toBlob(doc);saveBlob(blob,"Raymond-Industrial-Training-Report.docx");$("exportStatus").textContent="Word document created successfully. Check your Downloads folder.";
-}catch(e){console.error(e);$("exportStatus").textContent="Word export failed: "+e.message+". You can still use Download PDF or Print / Save PDF.";alert("Word export failed: "+e.message);}
-finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-word me-1"></i>Download Word (.docx)';}
+  try{
+    async function loadDocx(){
+      if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
+      const sources=[
+        "https://cdn.jsdelivr.net/npm/docx@8.5.2/build/index.umd.js",
+        "https://unpkg.com/docx@8.5.2/build/index.umd.js"
+      ];
+      for(const src of sources){
+        try{
+          await new Promise((resolve,reject)=>{
+            const script=document.createElement("script");
+            script.src=src;script.async=true;
+            script.onload=resolve;script.onerror=()=>reject(new Error("Library request failed"));
+            document.head.appendChild(script);
+          });
+          if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
+        }catch(err){console.warn("DOCX library fallback:",src,err);}
+      }
+      throw new Error("The DOCX library could not be loaded by this browser.");
+    }
+    const D=await loadDocx();
+    const children=[];
+    const pages=Array.from($("report").querySelectorAll(".report-page"));
+    if(!pages.length)throw new Error("Generate the report before downloading it.");
+    const addText=(value,opts={})=>{
+      const textValue=(value||"").trim();
+      if(!textValue)return;
+      children.push(new D.Paragraph({
+        children:[new D.TextRun({text:textValue})],
+        alignment:opts.center?D.AlignmentType.CENTER:(opts.justify?D.AlignmentType.JUSTIFIED:D.AlignmentType.LEFT),
+        heading:opts.heading,
+        spacing:{after:opts.after||120,line:360}
+      }));
+    };
+    const addImage=async(img)=>{
+      let dataUrl=img.currentSrc||img.src||"";
+      if(!dataUrl.startsWith("data:")){
+        const response=await fetch(dataUrl,{mode:"cors"});
+        if(!response.ok)throw new Error("Could not fetch an image used in the report.");
+        const blob=await response.blob();
+        dataUrl=await new Promise((resolve,reject)=>{
+          const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);
+        });
+      }
+      const parts=dataUrl.split(",");
+      if(parts.length<2)throw new Error("An evidence image has invalid data.");
+      const binary=atob(parts[1]);
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+      const mime=(parts[0].match(/data:image\/([^;]+)/i)||[])[1]||"jpeg";
+      const type=mime==="png"?"png":(mime==="gif"?"gif":"jpg");
+      const width=img.naturalWidth||1200,height=img.naturalHeight||800;
+      const scale=Math.min(1,430/width,620/height);
+      children.push(new D.Paragraph({
+        children:[new D.ImageRun({data:bytes,type,transformation:{width:Math.max(1,Math.round(width*scale)),height:Math.max(1,Math.round(height*scale))}})],
+        alignment:D.AlignmentType.CENTER,
+        spacing:{before:100,after:100}
+      }));
+    };
+    for(let pi=0;pi<pages.length;pi++){
+      const page=pages[pi];
+      for(const node of Array.from(page.children)){
+        if(node.classList&&node.classList.contains("page-number"))continue;
+        if(/^H[1-3]$/.test(node.tagName)){
+          const level=node.tagName==="H1"?D.HeadingLevel.TITLE:node.tagName==="H2"?D.HeadingLevel.HEADING_1:D.HeadingLevel.HEADING_2;
+          addText(node.innerText,{heading:level,center:node.tagName==="H1",after:180});
+        }else if(node.tagName==="P"){
+          addText(node.innerText,{justify:true});
+        }else if(node.tagName==="OL"||node.tagName==="UL"){
+          Array.from(node.querySelectorAll(":scope > li")).forEach((li,i)=>{
+            addText((node.tagName==="OL"?(i+1)+". ":"• ")+li.innerText,{after:70});
+          });
+        }else if(node.tagName==="FIGURE"){
+          const image=node.querySelector("img");
+          if(image)await addImage(image);
+          const caption=node.querySelector("figcaption");
+          if(caption)addText(caption.innerText,{center:true,after:180});
+        }else if(node.tagName==="TABLE"){
+          for(const tr of Array.from(node.rows)){
+            addText(Array.from(tr.cells).map(cell=>cell.innerText).join("  |  "),{after:80});
+          }
+        }else if(node.tagName==="DIV"){
+          for(const image of Array.from(node.querySelectorAll("img")))await addImage(image);
+          for(const p of Array.from(node.querySelectorAll("p")))addText(p.innerText,{center:true});
+        }else if(node.innerText){
+          addText(node.innerText);
+        }
+      }
+      if(pi<pages.length-1)children.push(new D.Paragraph({children:[new D.PageBreak()]}));
+    }
+    const doc=new D.Document({
+      sections:[{
+        properties:{page:{size:{width:11906,height:16838},margin:{top:1417,right:1247,bottom:1417,left:2154}}},
+        children
+      }]
+    });
+    const blob=await D.Packer.toBlob(doc);
+    if(!blob||blob.size<1000)throw new Error("The generated Word document was empty.");
+    saveBlob(blob,"Raymond-Industrial-Training-Report.docx");
+    $("exportStatus").textContent="Word document downloaded successfully with "+state.userImages.length+" uploaded evidence photo(s).";
+  }catch(err){
+    console.error("DOCX export:",err);
+    downloadWordCompatibleCopy("The .docx generator was unavailable, so this compatible Word format was used instead. Reason: "+err.message);
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML=original;
+  }
 };
-
 /* Raymond Report Studio photo rotation: real image layers, preload-before-fade, skip failed URLs. */
 (function(){
   const hero=document.querySelector(".hero");
