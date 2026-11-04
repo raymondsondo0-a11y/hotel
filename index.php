@@ -301,7 +301,7 @@ aside .cardx.side .small{color:#34483d!important;line-height:1.65!important}
 <div class="col-md-6"><label class="form-label">Academic supervisor</label><input id="academicSupervisor" class="form-control" placeholder="Full name"></div>
 <div class="col-md-6"><label class="form-label">Academic year</label><input id="year" class="form-control" placeholder="e.g. 2026/2027"></div>
 <div class="col-md-6"><label class="form-label">Report language</label><select id="lang" class="form-select"><option>English</option><option>Kiswahili</option></select></div>
-<div class="col-12"><label class="form-label">Detailed descriptions of work performed (optional)</label><textarea id="activityDetails" rows="5" class="form-control" placeholder="Describe each networking task in more detail: what you did, tools used, steps followed, what you observed, and what you learned. Use a separate paragraph for each activity."></textarea><div class="form-text">Only enter work you actually performed or observed.</div></div><div class="col-12"><label class="form-label">Extra verified facts (optional)</label><textarea id="extraFacts" rows="3" class="form-control" placeholder="Add company background, dates, device models, tools, outcomes or other verified details."></textarea></div><div class="col-12"><div class="border rounded-3 p-3"><h5 class="fw-bold"><i class="bi bi-images me-2 text-primary"></i>Workplace photos and networking equipment</h5><p class="muted-small">Upload your own photos of routers, switches, access points, RJ45 connectors, crimping tools, cable testers, spanners, ladders, racks, cables and other equipment used during training.</p><label class="form-label">Upload photos (JPG, PNG or WEBP)</label><input id="workPhotos" type="file" class="form-control" accept="image/jpeg,image/png,image/webp" multiple><div class="form-text">Select several photos and add a caption to each one. They will be included in a photographic evidence section of the report.</div><div id="photoList" class="row g-3 mt-2"></div></div></div>
+<div class="col-12"><label class="form-label">Detailed descriptions of work performed (optional)</label><textarea id="activityDetails" rows="5" class="form-control" placeholder="Describe each networking task in more detail: what you did, tools used, steps followed, what you observed, and what you learned. Use a separate paragraph for each activity."></textarea><div class="form-text">Only enter work you actually performed or observed.</div></div><div class="col-12"><label class="form-label">Extra verified facts (optional)</label><textarea id="extraFacts" rows="3" class="form-control" placeholder="Add company background, dates, device models, tools, outcomes or other verified details."></textarea></div><div class="col-12"><div class="border rounded-3 p-3"><h5 class="fw-bold"><i class="bi bi-images me-2 text-primary"></i>Workplace photos and networking equipment</h5><p class="muted-small">Upload your own photos of routers, switches, access points, RJ45 connectors, crimping tools, cable testers, spanners, ladders, racks, cables and other equipment used during training.</p><label class="form-label">Upload photos (JPG, PNG or WEBP)</label><input id="workPhotos" type="file" class="form-control" accept="image/jpeg,image/png,image/webp" multiple><div class="form-text">Select several photos and add a caption to each one. They will be included in a photographic evidence section of the report.</div><div class="d-flex justify-content-between align-items-center mt-2"><span id="photoCount" class="small fw-semibold">0 photo(s) ready</span><span id="photoUploadStatus" class="small text-primary" role="status" aria-live="polite"></span></div><div id="photoList" class="row g-3 mt-2"></div></div></div>
 </div><div class="d-flex justify-content-between mt-4"><button class="btn btn-outline-secondary" id="back2">Back</button><button class="btn btn-primary" id="analyse">Analyse documents <i class="bi bi-search ms-1"></i></button></div></section>
 <section id="step4" class="hidden"><span class="eyebrow">STEP 04 / DOCUMENT ANALYSIS</span><h2 class="title mt-3">Analysing the reference format and activities</h2><p class="sub">The two sample reports are compared for structure only. The activity-review document is analysed separately to identify the real tasks for the new report.</p>
 <div class="progress my-3"><div class="progress-bar progress-bar-striped progress-bar-animated" id="progress" style="width:0%"></div></div><div id="status" class="info">Preparing to read documents…</div>
@@ -318,7 +318,7 @@ aside .cardx.side .small{color:#34483d!important;line-height:1.65!important}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.2/docx.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.2/build/index.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 (function(){
@@ -343,8 +343,48 @@ throw new Error("Unsupported document: "+f.name+". Use PDF, DOCX or TXT.");
 }
 function cleanText(s){return String(s||"").replace(/\u0000/g,"").replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim();}
 function readDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error("Could not read image: "+file.name));reader.readAsDataURL(file);});}
-$("workPhotos").addEventListener("change",async e=>{const files=Array.from(e.target.files||[]);$("photoList").innerHTML='<div class="col-12 small text-primary">Loading selected photos…</div>';state.userImages=[];try{for(const file of files){if(!file.type.startsWith("image/"))continue;const data=await readDataUrl(file);state.userImages.push({name:file.name,data,caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")});}renderPhotoList();}catch(err){$("photoList").textContent=err.message;}});
-function renderPhotoList(){$("photoList").innerHTML=state.userImages.map((im,i)=>'<div class="col-6 col-md-4"><div class="border rounded-3 p-2 h-100"><img src="'+im.data+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:8px"><label class="form-label small mt-2">Photo caption</label><input class="form-control form-control-sm photo-caption" data-index="'+i+'" value="'+esc(im.caption)+'"><button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-photo" data-index="'+i+'">Remove</button></div></div>').join("");document.querySelectorAll(".photo-caption").forEach(el=>el.addEventListener("input",e=>{state.userImages[+e.target.dataset.index].caption=e.target.value;}));document.querySelectorAll(".remove-photo").forEach(el=>el.addEventListener("click",e=>{state.userImages.splice(+e.target.dataset.index,1);renderPhotoList();}));}
+async function preparePhoto(file){
+  if(!file.type.startsWith("image/"))throw new Error("Unsupported file type: "+file.name);
+  if(file.size>20*1024*1024)throw new Error(file.name+" is larger than 20 MB. Please resize it and try again.");
+  const source=await readDataUrl(file);
+  const img=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error("This image could not be opened: "+file.name));image.src=source;});
+  const maxSide=2000,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+  canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+  const ctx=canvas.getContext("2d");
+  if(!ctx)throw new Error("Your browser could not process "+file.name);
+  ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.86),caption:file.name.replace(/\\.[^.]+$/,"").replace(/[_-]+/g," ")};
+}
+$("workPhotos").addEventListener("change",async e=>{
+  const files=Array.from(e.target.files||[]);
+  if(!files.length)return;
+  const existing=new Set(state.userImages.map(im=>im.name+"|"+im.size));
+  const pending=files.filter(file=>!existing.has(file.name+"|"+file.size));
+  let added=0,errors=[];
+  $("photoList").innerHTML='<div class="col-12 small text-primary">Preparing '+pending.length+' selected photo(s)…</div>';
+  for(let i=0;i<pending.length;i++){
+    const file=pending[i];
+    if(state.userImages.length>=40){errors.push("Maximum of 40 photos per report reached.");break;}
+    try{
+      const photo=await preparePhoto(file);
+      state.userImages.push(photo);added++;
+      $("photoList").innerHTML='<div class="col-12 small text-primary">Loaded '+(i+1)+' of '+pending.length+' selected photos…</div>';
+    }catch(err){errors.push(err.message);}
+  }
+  renderPhotoList();
+  const summary=added+" photo(s) added. "+state.userImages.length+" photo(s) ready in total.";
+  $("photoUploadStatus").textContent=summary+(errors.length?" Some files were skipped: "+errors.join(" | "):"");
+  e.target.value="";
+});
+function renderPhotoList(){
+  $("photoList").innerHTML=state.userImages.map((im,i)=>'<div class="col-6 col-md-4"><div class="border rounded-3 p-2 h-100"><img src="'+im.data+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:8px"><label class="form-label small mt-2">Photo caption</label><input class="form-control form-control-sm photo-caption" data-index="'+i+'" value="'+esc(im.caption)+'"><button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-photo" data-index="'+i+'">Remove</button></div></div>').join("");
+  $("photoCount").textContent=state.userImages.length+" photo(s) ready";
+  document.querySelectorAll(".photo-caption").forEach(el=>el.addEventListener("input",e=>{state.userImages[+e.target.dataset.index].caption=e.target.value;}));
+  document.querySelectorAll(".remove-photo").forEach(el=>el.addEventListener("click",e=>{state.userImages.splice(+e.target.dataset.index,1);renderPhotoList();$("photoUploadStatus").textContent="Photo removed. "+state.userImages.length+" photo(s) remain."; }));
+}
 function linesOf(s){return cleanText(s).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);}
 function detectHeadings(text){
 const ls=linesOf(text),out=[];
@@ -571,10 +611,24 @@ $("downloadHtml").onclick=()=>{try{saveBlob(new Blob([fullHtml()],{type:"applica
 $("printReport").onclick=()=>{const w=window.open("","_blank");if(!w){$("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com, or use Download PDF.";return;}w.document.open();w.document.write(fullHtml()+"<script>window.onload=function(){setTimeout(function(){window.print()},1000)};<\/script>");w.document.close();};
 $("downloadPdf").onclick=async()=>{const btn=$("downloadPdf");if(!window.html2pdf){$("exportStatus").textContent="PDF library did not load. Check your internet connection, reload the page and try again.";return;}btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating PDF…';$("exportStatus").textContent="Preparing report pages for PDF download…";try{await window.html2pdf().set({margin:0,filename:"Raymond-Industrial-Training-Report.pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:1.5,useCORS:true,allowTaint:false,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from($("report")).save();$("exportStatus").textContent="PDF export completed. Check your Downloads folder.";}catch(e){console.error(e);$("exportStatus").textContent="PDF export failed: "+e.message+". Use Print / Save PDF as an alternative.";}finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-pdf me-1"></i>Download PDF';}};
 $("downloadDocx").onclick=async()=>{
-if(!window.docx){alert("The Word document library could not load. Use Download report copy or Print / Save PDF.");return;}
+async function ensureDocxLibrary(){
+  if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
+  const urls=["https://cdn.jsdelivr.net/npm/docx@8.5.2/build/index.umd.js","https://unpkg.com/docx@8.5.2/build/index.umd.js"];
+  for(const src of urls){
+    try{
+      await new Promise((resolve,reject)=>{
+        const script=document.createElement("script");script.src=src;script.async=true;
+        script.onload=resolve;script.onerror=()=>reject(new Error("Could not load "+src));
+        document.head.appendChild(script);
+      });
+      if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
+    }catch(err){console.warn(err);}
+  }
+  throw new Error("Word export library could not be loaded. Check your internet connection or browser content blockers.");
+}
 const btn=$("downloadDocx");btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating Word document…';
 try{
-const D=window.docx,children=[];await document.fonts.ready;
+const D=await ensureDocxLibrary(),children=[];await document.fonts.ready;
 const sections=Array.from($("report").querySelectorAll(".report-page"));
 for(let pi=0;pi<sections.length;pi++){
 const sheet=sections[pi];
@@ -599,7 +653,7 @@ if(pi<sections.length-1)children.push(new D.Paragraph({children:[new D.PageBreak
 }
 const doc=new D.Document({sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1417,right:1247,bottom:1417,left:2154}}},children}]});
 const blob=await D.Packer.toBlob(doc);saveBlob(blob,"Raymond-Industrial-Training-Report.docx");$("exportStatus").textContent="Word document created successfully. Check your Downloads folder.";
-}catch(e){console.error(e);$("exportStatus").textContent="Word export failed: "+e.message+". Try Download report copy or Print / Save PDF.";}
+}catch(e){console.error(e);$("exportStatus").textContent="Word export failed: "+e.message+". You can still use Download PDF or Print / Save PDF.";alert("Word export failed: "+e.message);}
 finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-word me-1"></i>Download Word (.docx)';}
 };
 
