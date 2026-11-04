@@ -348,7 +348,7 @@ async function preparePhoto(file){
   if(file.size>20*1024*1024)throw new Error(file.name+" is larger than 20 MB. Please resize it and try again.");
   const source=await readDataUrl(file);
   const img=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error("This image could not be opened: "+file.name));image.src=source;});
-  const maxSide=1800,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+  const maxSide=1280,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
   const canvas=document.createElement("canvas");
   canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
   canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
@@ -356,7 +356,7 @@ async function preparePhoto(file){
   if(!ctx)throw new Error("Your browser could not process "+file.name);
   ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.80),caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")};
+  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.68),caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")};
 }
 $("workPhotos").addEventListener("change",async e=>{
   const files=Array.from(e.target.files||[]);
@@ -529,15 +529,19 @@ pages.push(makePage(chapterName(4,"CHAPTER FIVE: CONCLUSION AND RECOMMENDATIONS"
 pages.push(makePage("References",'<ol><li>Internet Engineering Task Force. (1981). <i>Internet Protocol (RFC 791)</i>. <a href="https://www.rfc-editor.org/rfc/rfc791">https://www.rfc-editor.org/rfc/rfc791</a>.</li><li>Internet Engineering Task Force. (1997). <i>Dynamic Host Configuration Protocol (RFC 2131)</i>. <a href="https://www.rfc-editor.org/rfc/rfc2131">https://www.rfc-editor.org/rfc/rfc2131</a>.</li><li>Internet Engineering Task Force. (1987). <i>Domain Names – Concepts and Facilities (RFC 1034)</i>. <a href="https://www.rfc-editor.org/rfc/rfc1034">https://www.rfc-editor.org/rfc/rfc1034</a>.</li><li>Cisco Networking Academy. (n.d.). <i>Networking courses and learning resources</i>. <a href="https://www.netacad.com/">https://www.netacad.com/</a>.</li>'+state.images.filter(Boolean).map((im,i)=>'<li>Wikimedia Commons. '+esc(im.title)+'. '+esc(im.license)+'. <a href="'+esc(im.source)+'">'+esc(im.source)+'</a>.</li>').join("")+'</ol><p class="smallnote">The references above support the technical concepts discussed in the report and identify the online sources used for the illustrations.</p>'));
 pages.push(makePage("Appendices",'<h3>Appendix A: Activity-review record</h3>'+p("The activity-review document supplied for report preparation is the primary factual source for the practical tasks described in Chapter Three. It records the work areas used to develop the practical discussion in this report.")+'<h3>Appendix B: Supporting evidence</h3>'+p("Supporting evidence associated with the training activities may include approved photographs, diagrams, task sheets, installation records and relevant logbook extracts. Such material complements the practical discussion and provides context for the work recorded.")+'<h3>Appendix C: Training correspondence</h3>'+p("The placement was supported by the organisation and academic supervision arrangements identified in the report particulars. Relevant correspondence and supervisor assessments form part of the administrative record of the training.")+'<h3>Appendix D: Supervisor information</h3>'+p("Company supervisor: "+cs+". Academic supervisor: "+as+".")));
 if(detailedNotes){const detailParas=detailedNotes.split(/\n{2,}/).map(x=>x.trim()).filter(Boolean);pages.push(makePage("Additional detailed descriptions of practical work",'<h3>Additional activity descriptions supplied by the trainee</h3>'+detailParas.map(x=>p(x)).join("")));}
-if(state.userImages.length){state.userImages.forEach((im,i)=>{const photoHtml='<figure style="margin:10px auto 22px;text-align:center"><img src="'+im.data+'" alt="'+esc(im.caption)+'" style="max-width:100%;max-height:190mm;object-fit:contain"><figcaption>Figure P.'+(i+1)+': '+esc(im.caption)+'. Source: Photograph supplied by the trainee.</figcaption></figure>';pages.push(makePage("Photographic evidence "+(i+1),'<h3>Workplace photograph: '+esc(im.caption)+'</h3>'+photoHtml));});}
+if(state.userImages.length){for(let i=0;i<state.userImages.length;i+=2){const batch=state.userImages.slice(i,i+2);const photoHtml=batch.map((im,j)=>'<figure style="margin:8px auto 12px;text-align:center;break-inside:avoid"><img src="'+im.data+'" alt="'+esc(im.caption)+'" style="max-width:100%;max-height:105mm;object-fit:contain"><figcaption>Figure P.'+(i+j+1)+': '+esc(im.caption)+'. Source: Photograph supplied by the trainee.</figcaption></figure>').join("");pages.push(makePage("Photographic evidence "+(i+1)+"–"+(i+batch.length),'<h3>Workplace photographic evidence</h3>'+photoHtml));}}
 return pages.join("");
 }
 $("build").onclick=async()=>{
 const btn=$("build");btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Preparing report and finding illustrations…';show(5);
 try{
 state.images=[];const tasks=state.activities.slice(0,24),groups=tasks.length>12?tasks.slice(0,11).concat(["Additional documented activities: "+tasks.slice(11).join("; ")]):tasks;
-for(let i=0;i<groups.length;i++){const q=imageQueryFor(groups[i]);const im=await sourceImage(q);state.images.push(im);$("reportStats").textContent="Searching online illustrations: "+(i+1)+" of "+groups.length+" topics…";}
+$("reportStats").textContent="Building report pages…";
 $("report").innerHTML=makeReport();
+/* Online illustrations are optional: load them in parallel with a short timeout so a slow image host cannot block report creation. */
+const imageJobs=groups.map(task=>Promise.race([sourceImage(imageQueryFor(task)),new Promise(resolve=>setTimeout(()=>resolve(null),4500))]));
+state.images=await Promise.all(imageJobs);
+if(state.images.some(Boolean)){$("report").innerHTML=makeReport();}
 const roman=["i","ii","iii","iv","v","vi","vii","viii","ix","x"];document.querySelectorAll("#report .report-page").forEach((pg,i)=>{const pn=pg.querySelector(".page-number");if(pn)pn.textContent=i===0?"":(i<=5?roman[i-1]:String(i-5));});
 const words=$("report").innerText.trim().split(/\s+/).length;const pageCount=document.querySelectorAll("#report .report-page").length;
 $("reportStats").innerHTML='<b>Report prepared:</b> '+pageCount+' designed report pages · '+words.toLocaleString()+' words · '+state.activities.length+' activity statements identified · '+state.images.filter(Boolean).length+' relevant online images attached. <span class="text-secondary">The final printed pagination may vary slightly by browser and printer settings.</span>';
@@ -576,158 +580,77 @@ function saveBlob(blob,filename){
   document.body.appendChild(a);a.click();
   setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},10000);
 }
+function downloadWordFile(){
+  const html=fullHtml();
+  const blob=new Blob(["\\ufeff",html],{type:"application/msword;charset=utf-8"});
+  saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
+}
 $("downloadHtml").onclick=()=>{
-  try{
-    const blob=new Blob([fullHtml()],{type:"application/msword;charset=utf-8"});
-    saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
-    $("exportStatus").textContent="Word-compatible report downloaded. Check your browser Downloads.";
-  }catch(e){
-    $("exportStatus").textContent="Download failed: "+e.message;
-  }
+  try{downloadWordFile();$("exportStatus").textContent="Word document (.doc) downloaded. Open it with Microsoft Word; it contains the report text and evidence photographs.";}
+  catch(e){$("exportStatus").textContent="Word download failed: "+e.message;}
 };
+$("downloadDocx").onclick=()=>{
+  const btn=$("downloadDocx"),old=btn.innerHTML;
+  btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Preparing Word file…';
+  try{downloadWordFile();$("exportStatus").textContent="Word document (.doc) downloaded successfully, including "+state.userImages.length+" uploaded evidence photo(s).";}
+  catch(e){$("exportStatus").textContent="Word download failed: "+e.message;}
+  finally{btn.disabled=false;btn.innerHTML=old;}
+};
+function openPrintView(autoPrint){
+  const w=window.open("","_blank");
+  if(!w){$("exportStatus").textContent="Pop-up blocked. Allow pop-ups for shizer.kesug.com, then try again.";return false;}
+  w.document.open();
+  w.document.write(fullHtml()+"<script>window.addEventListener('load',function(){var imgs=Array.from(document.images);Promise.all(imgs.map(function(i){return i.complete?Promise.resolve():new Promise(function(r){i.onload=i.onerror=r;});})).then(function(){if(true)setTimeout(function(){window.print();},350);});});<\\/script>");
+  w.document.close();
+  return true;
+}
 $("printReport").onclick=()=>{
-  try{
-    const w=window.open("","_blank");
-    if(!w){
-      $("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com and try again.";
-      return;
-    }
-    w.document.open();
-    w.document.write(fullHtml());
-    w.document.close();
-    const triggerPrint=()=>{
-      w.focus();
-      w.print();
-    };
-    if(w.document.readyState==="complete")setTimeout(triggerPrint,500);
-    else w.addEventListener("load",()=>setTimeout(triggerPrint,500),{once:true});
-    $("exportStatus").textContent="Print view opened. Choose your printer or Save as PDF.";
-  }catch(e){
-    $("exportStatus").textContent="Print failed: "+e.message;
-  }
+  if(openPrintView(true))$("exportStatus").textContent="Print window opened. Select your printer or Save as PDF.";
 };
-function saveBlob(blob,filename){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},10000);}
-$("downloadHtml").onclick=()=>{try{saveBlob(new Blob([fullHtml()],{type:"application/msword"}),"Raymond-Industrial-Training-Report.doc");$("exportStatus").textContent="Word-compatible report copy prepared. Check your browser Downloads.";}catch(e){$("exportStatus").textContent="Download failed: "+e.message;}};
-$("printReport").onclick=()=>{const w=window.open("","_blank");if(!w){$("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com, or use Download PDF.";return;}w.document.open();w.document.write(fullHtml()+"<script>window.onload=function(){setTimeout(function(){window.print()},1000)};<\/script>");w.document.close();};
-$("downloadPdf").onclick=async()=>{const btn=$("downloadPdf");if(!window.html2pdf){$("exportStatus").textContent="PDF library did not load. Check your internet connection, reload the page and try again.";return;}btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Creating PDF…';$("exportStatus").textContent="Preparing report pages for PDF download…";try{await window.html2pdf().set({margin:0,filename:"Raymond-Industrial-Training-Report.pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:1.5,useCORS:true,allowTaint:false,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from($("report")).save();$("exportStatus").textContent="PDF export completed. Check your Downloads folder.";}catch(e){console.error(e);$("exportStatus").textContent="PDF export failed: "+e.message+". Use Print / Save PDF as an alternative.";}finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-pdf me-1"></i>Download PDF';}};
-$("downloadDocx").onclick=async()=>{
-  const btn=$("downloadDocx");
-  const original=btn.innerHTML;
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Preparing Word report…';
-  $("exportStatus").textContent="Preparing the complete report and all uploaded evidence photographs for Microsoft Word…";
-  function downloadWordCompatibleCopy(reason){
-    const blob=new Blob(["\ufeff",fullHtml()],{type:"application/msword;charset=utf-8"});
-    saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
-    $("exportStatus").textContent="A Word-compatible .doc file containing the full report and uploaded evidence has been downloaded. "+reason;
+async function loadPdfLibrary(){
+  if(window.html2pdf)return window.html2pdf;
+  const urls=[
+    "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+    "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js",
+    "https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+  ];
+  for(const url of urls){
+    try{
+      await new Promise((resolve,reject)=>{
+        const script=document.createElement("script");script.src=url;script.async=true;
+        const timer=setTimeout(()=>reject(new Error("Library load timeout")),9000);
+        script.onload=()=>{clearTimeout(timer);resolve();};
+        script.onerror=()=>{clearTimeout(timer);reject(new Error("CDN unavailable"));};
+        document.head.appendChild(script);
+      });
+      if(window.html2pdf)return window.html2pdf;
+    }catch(e){console.warn("PDF library source failed",url,e);}
   }
+  return null;
+}
+$("downloadPdf").onclick=async()=>{
+  const btn=$("downloadPdf"),old=btn.innerHTML;
+  btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Preparing PDF…';
+  $("exportStatus").textContent="Preparing the PDF. Large evidence collections may take a little longer…";
   try{
-    async function loadDocx(){
-      if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
-      const sources=[
-        "https://cdn.jsdelivr.net/npm/docx@8.5.2/build/index.umd.js",
-        "https://unpkg.com/docx@8.5.2/build/index.umd.js"
-      ];
-      for(const src of sources){
-        try{
-          await new Promise((resolve,reject)=>{
-            const script=document.createElement("script");
-            script.src=src;script.async=true;
-            script.onload=resolve;script.onerror=()=>reject(new Error("Library request failed"));
-            document.head.appendChild(script);
-          });
-          if(window.docx&&window.docx.Document&&window.docx.Packer)return window.docx;
-        }catch(err){console.warn("DOCX library fallback:",src,err);}
-      }
-      throw new Error("The DOCX library could not be loaded by this browser.");
+    const pdf=await loadPdfLibrary();
+    if(!pdf){
+      $("exportStatus").textContent="Automatic PDF download is unavailable in this browser. Opening the print dialog so you can choose Save as PDF.";
+      openPrintView(true);return;
     }
-    const D=await loadDocx();
-    const children=[];
-    const pages=Array.from($("report").querySelectorAll(".report-page"));
-    if(!pages.length)throw new Error("Generate the report before downloading it.");
-    const addText=(value,opts={})=>{
-      const textValue=(value||"").trim();
-      if(!textValue)return;
-      children.push(new D.Paragraph({
-        children:[new D.TextRun({text:textValue})],
-        alignment:opts.center?D.AlignmentType.CENTER:(opts.justify?D.AlignmentType.JUSTIFIED:D.AlignmentType.LEFT),
-        heading:opts.heading,
-        spacing:{after:opts.after||120,line:360}
-      }));
-    };
-    const addImage=async(img)=>{
-      let dataUrl=img.currentSrc||img.src||"";
-      if(!dataUrl.startsWith("data:")){
-        const response=await fetch(dataUrl,{mode:"cors"});
-        if(!response.ok)throw new Error("Could not fetch an image used in the report.");
-        const blob=await response.blob();
-        dataUrl=await new Promise((resolve,reject)=>{
-          const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);
-        });
-      }
-      const parts=dataUrl.split(",");
-      if(parts.length<2)throw new Error("An evidence image has invalid data.");
-      const binary=atob(parts[1]);
-      const bytes=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-      const mime=(parts[0].match(/data:image\/([^;]+)/i)||[])[1]||"jpeg";
-      const type=mime==="png"?"png":(mime==="gif"?"gif":"jpg");
-      const width=img.naturalWidth||1200,height=img.naturalHeight||800;
-      const scale=Math.min(1,430/width,620/height);
-      children.push(new D.Paragraph({
-        children:[new D.ImageRun({data:bytes,type,transformation:{width:Math.max(1,Math.round(width*scale)),height:Math.max(1,Math.round(height*scale))}})],
-        alignment:D.AlignmentType.CENTER,
-        spacing:{before:100,after:100}
-      }));
-    };
-    for(let pi=0;pi<pages.length;pi++){
-      const page=pages[pi];
-      for(const node of Array.from(page.children)){
-        if(node.classList&&node.classList.contains("page-number"))continue;
-        if(/^H[1-3]$/.test(node.tagName)){
-          const level=node.tagName==="H1"?D.HeadingLevel.TITLE:node.tagName==="H2"?D.HeadingLevel.HEADING_1:D.HeadingLevel.HEADING_2;
-          addText(node.innerText,{heading:level,center:node.tagName==="H1",after:180});
-        }else if(node.tagName==="P"){
-          addText(node.innerText,{justify:true});
-        }else if(node.tagName==="OL"||node.tagName==="UL"){
-          Array.from(node.querySelectorAll(":scope > li")).forEach((li,i)=>{
-            addText((node.tagName==="OL"?(i+1)+". ":"• ")+li.innerText,{after:70});
-          });
-        }else if(node.tagName==="FIGURE"){
-          const image=node.querySelector("img");
-          if(image)await addImage(image);
-          const caption=node.querySelector("figcaption");
-          if(caption)addText(caption.innerText,{center:true,after:180});
-        }else if(node.tagName==="TABLE"){
-          for(const tr of Array.from(node.rows)){
-            addText(Array.from(tr.cells).map(cell=>cell.innerText).join("  |  "),{after:80});
-          }
-        }else if(node.tagName==="DIV"){
-          for(const image of Array.from(node.querySelectorAll("img")))await addImage(image);
-          for(const p of Array.from(node.querySelectorAll("p")))addText(p.innerText,{center:true});
-        }else if(node.innerText){
-          addText(node.innerText);
-        }
-      }
-      if(pi<pages.length-1)children.push(new D.Paragraph({children:[new D.PageBreak()]}));
-    }
-    const doc=new D.Document({
-      sections:[{
-        properties:{page:{size:{width:11906,height:16838},margin:{top:1417,right:1247,bottom:1417,left:2154}}},
-        children
-      }]
-    });
-    const blob=await D.Packer.toBlob(doc);
-    if(!blob||blob.size<1000)throw new Error("The generated Word document was empty.");
-    saveBlob(blob,"Raymond-Industrial-Training-Report.docx");
-    $("exportStatus").textContent="Word document downloaded successfully with "+state.userImages.length+" uploaded evidence photo(s).";
-  }catch(err){
-    console.error("DOCX export:",err);
-    downloadWordCompatibleCopy("The .docx generator was unavailable, so this compatible Word format was used instead. Reason: "+err.message);
-  }finally{
-    btn.disabled=false;
-    btn.innerHTML=original;
-  }
+    await pdf().set({
+      margin:0,filename:"Raymond-Industrial-Training-Report.pdf",
+      image:{type:"jpeg",quality:0.84},
+      html2canvas:{scale:1,useCORS:true,allowTaint:false,backgroundColor:"#ffffff",logging:false,removeContainer:true},
+      jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+      pagebreak:{mode:["css","legacy"]}
+    }).from($("report")).save();
+    $("exportStatus").textContent="PDF downloaded successfully. Check your Downloads folder.";
+  }catch(e){
+    console.error("PDF export failed",e);
+    $("exportStatus").textContent="PDF conversion could not finish. Opening Print / Save as PDF instead.";
+    openPrintView(true);
+  }finally{btn.disabled=false;btn.innerHTML=old;}
 };
 /* Raymond Report Studio photo rotation: real image layers, preload-before-fade, skip failed URLs. */
 (function(){
