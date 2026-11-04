@@ -507,36 +507,65 @@ finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-file-earmark-richtext 
 };
 $("back4").onclick=()=>show(4);
 $("rebuild").onclick=()=>$("build").click();
-function fullHtml(){return '<!doctype html><html><head><meta charset="utf-8"><title>'+esc(val("rTitle","Industrial Training Report"))+'</title><style>@page{size:A4;margin:0}body{margin:0;font-family:"Times New Roman",serif;color:#202b3a}.report-page{box-sizing:border-box;width:210mm;height:297mm;min-height:297mm;padding:24mm 22mm 22mm 32mm;position:relative;break-after:page;page-break-after:always;overflow:hidden;font-size:12pt;line-height:1.5}.report-page:last-child{break-after:auto;page-break-after:auto}.report-page h1{text-align:center;font-size:16pt;color:#142b50}.report-page h2{font-size:13pt;color:#173b72;border-bottom:1px solid #b9cbe3;padding-bottom:5px}.report-page h3{font-size:12pt;color:#203f70}.report-page p{text-align:justify;margin:0 0 10px}.report-page table{border-collapse:collapse;width:100%;font-size:10pt}.report-page td,.report-page th{border:1px solid #8797aa;padding:6px}.report-page img{max-width:100%;max-height:50mm;object-fit:contain}.page-number{position:absolute;bottom:9mm;left:0;right:0;text-align:center;font-size:9pt}</style></head><body>'+ $("report").innerHTML+'<script>
-/* Smooth graduation-photo slideshow: preload first, then crossfade every 3 seconds. */
-(function(){
-  const hero=document.querySelector(".hero");
-  if(!hero)return;
-  const photos=[
-    "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1627556704302-624286467c65?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=2000&q=85",
-    "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=2000&q=85"
-  ];
-  let index=0,showB=false;
-  hero.style.setProperty("--grad-photo-a",'url("'+photos[0]+'")');
-  hero.style.setProperty("--grad-photo-b",'url("'+photos[1]+'")');
-  photos.forEach(function(src){const img=new Image();img.src=src;});
-  window.setInterval(function(){
-    index=(index+1)%photos.length;
-    const next=photos[index];
-    const preload=new Image();
-    preload.onload=function(){
-      if(showB){hero.style.setProperty("--grad-photo-a",'url("'+next+'")');hero.classList.remove("photo-b");}
-      else{hero.style.setProperty("--grad-photo-b",'url("'+next+'")');hero.classList.add("photo-b");}
-      showB=!showB;
+function fullHtml(){
+  const title=esc(val("rTitle","Industrial Training Report"));
+  const reportContent=$("report").innerHTML;
+  const styles=`
+    @page{size:A4;margin:0}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:#202b3a;font-family:"Times New Roman",serif}
+    .report-page{box-sizing:border-box;width:210mm;min-height:297mm;height:297mm;padding:24mm 22mm 22mm 32mm;position:relative;break-after:page;page-break-after:always;overflow:hidden;font-size:12pt;line-height:1.5;background:#fff}
+    .report-page:last-child{break-after:auto;page-break-after:auto}
+    .report-page h1{text-align:center;font-size:16pt;color:#142b50}
+    .report-page h2{font-size:13pt;color:#173b72;border-bottom:1px solid #b9cbe3;padding-bottom:5px}
+    .report-page h3{font-size:12pt;color:#203f70}
+    .report-page p{text-align:justify;margin:0 0 10px}
+    .report-page table{border-collapse:collapse;width:100%;font-size:10pt}
+    .report-page td,.report-page th{border:1px solid #8797aa;padding:6px}
+    .report-page img{max-width:100%;max-height:50mm;object-fit:contain}
+    .page-number{position:absolute;bottom:9mm;left:0;right:0;text-align:center;font-size:9pt}
+    @media screen{body{background:#e9eef5;padding:12px}.report-page{margin:0 auto 12px;box-shadow:0 2px 12px rgba(0,0,0,.12)}}
+    @media print{html,body{background:#fff!important}.report-page{margin:0;box-shadow:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  `;
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>'+styles+'</style></head><body>'+reportContent+'</body></html>';
+}
+function saveBlob(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=filename;a.style.display="none";
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},10000);
+}
+$("downloadHtml").onclick=()=>{
+  try{
+    const blob=new Blob([fullHtml()],{type:"application/msword;charset=utf-8"});
+    saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
+    $("exportStatus").textContent="Word-compatible report downloaded. Check your browser Downloads.";
+  }catch(e){
+    $("exportStatus").textContent="Download failed: "+e.message;
+  }
+};
+$("printReport").onclick=()=>{
+  try{
+    const w=window.open("","_blank");
+    if(!w){
+      $("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com and try again.";
+      return;
+    }
+    w.document.open();
+    w.document.write(fullHtml());
+    w.document.close();
+    const triggerPrint=()=>{
+      w.focus();
+      w.print();
     };
-    preload.onerror=function(){index=(index+1)%photos.length;};
-    preload.src=next;
-  },3000);
-})();</script>\n</body></html>';}
+    if(w.document.readyState==="complete")setTimeout(triggerPrint,500);
+    else w.addEventListener("load",()=>setTimeout(triggerPrint,500),{once:true});
+    $("exportStatus").textContent="Print view opened. Choose your printer or Save as PDF.";
+  }catch(e){
+    $("exportStatus").textContent="Print failed: "+e.message;
+  }
+};
 function saveBlob(blob,filename){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},10000);}
 $("downloadHtml").onclick=()=>{try{saveBlob(new Blob([fullHtml()],{type:"application/msword"}),"Raymond-Industrial-Training-Report.doc");$("exportStatus").textContent="Word-compatible report copy prepared. Check your browser Downloads.";}catch(e){$("exportStatus").textContent="Download failed: "+e.message;}};
 $("printReport").onclick=()=>{const w=window.open("","_blank");if(!w){$("exportStatus").textContent="Your browser blocked the print window. Allow pop-ups for shizer.kesug.com, or use Download PDF.";return;}w.document.open();w.document.write(fullHtml()+"<script>window.onload=function(){setTimeout(function(){window.print()},1000)};<\/script>");w.document.close();};
