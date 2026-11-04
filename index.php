@@ -398,6 +398,9 @@ const found=[];
 const add=value=>{
 let v=String(value||"").replace(/^[\\s:|#-]+/,"").replace(/[\\s|]+$/,"").replace(/\\s+/g," ").trim();
 v=v.replace(/^(?:activity|work performed)\\s*[:|-]?\\s*/i,"");
+// A table cell may contain several dated daily notes; the dated-note parser below
+// separates them into individual activities instead of treating the whole cell as one task.
+if(/\\b\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|/.test(v))return;
 if(v.length<12||v.length>500)return;
 if(/^(?:supervisor name|signature|date|week day date|work hours|log book|page \\d+)/i.test(v))return;
 if(!found.some(x=>x.toLowerCase()===v.toLowerCase()))found.push(v);
