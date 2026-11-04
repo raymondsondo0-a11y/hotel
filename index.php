@@ -356,7 +356,7 @@ async function preparePhoto(file){
   if(!ctx)throw new Error("Your browser could not process "+file.name);
   ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.86),caption:file.name.replace(/\\.[^.]+$/,"").replace(/[_-]+/g," ")};
+  return {name:file.name,size:file.size,data:canvas.toDataURL("image/jpeg",0.86),caption:file.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ")};
 }
 $("workPhotos").addEventListener("change",async e=>{
   const files=Array.from(e.target.files||[]);
