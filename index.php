@@ -392,6 +392,33 @@ const re=/^(chapter\s+[0-9ivx]+|[0-9]+(?:\.[0-9]+){0,3}\s+|[A-Z][A-Z\s:&/()\-]{5
 for(const line of ls){if(line.length<5||line.length>105)continue;if(re.test(line)&&!out.some(x=>x.toLowerCase()===line.toLowerCase()))out.push(line);}
 return out.slice(0,45);
 }
+function parseLogbookActivities(text){
+const source=cleanText(text).replace(/\\s+/g," ").trim();
+const found=[];
+const add=value=>{
+let v=String(value||"").replace(/^[\\s:|#-]+/,"").replace(/[\\s|]+$/,"").replace(/\\s+/g," ").trim();
+v=v.replace(/^(?:activity|work performed)\\s*[:|-]?\\s*/i,"");
+if(v.length<12||v.length>500)return;
+if(/^(?:supervisor name|signature|date|week day date|work hours|log book|page \\d+)/i.test(v))return;
+if(!found.some(x=>x.toLowerCase()===v.toLowerCase()))found.push(v);
+};
+// Standard logbook table rows: row number, week, weekday, date, hours, activity.
+const row=/\\b\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+([\\s\\S]*?)(?=\\s+\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+|\\s+(?:Supervisor Name|LOG BOOK OF|Week Day Date|$))/gi;
+let m;
+while((m=row.exec(source))!==null)add(m[1]);
+// Some logbooks put dated daily notes inside the activity cell, separated by pipes.
+const dated=/\\b\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|?\\s*([^|]*?)(?=\\s+\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}\\s*\\(?[A-Za-z]+\\)?\\s*\\|?|\\s+(?:Supervisor Name|LOG BOOK OF|$))/gi;
+while((m=dated.exec(source))!==null)add(m[1]);
+// Fallback for text extractors that remove table boundaries but retain numbered entries.
+if(!found.length){
+const fragments=source.split(/(?=\\b\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-])/i);
+for(const part of fragments){
+const x=part.match(/^\\d{1,2}\\s+\\d{1,2}\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s+\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}\\s+\\d{1,2}\\s+(.+?)(?=\\s+(?:Supervisor Name|LOG BOOK OF)|$)/i);
+if(x)add(x[1]);
+}
+}
+return found.slice(0,40);
+}
 function parseActivities(text){
 let raw=linesOf(text),items=[];
 const skip=/^(requirements?|review of activities|activities performed|tasks performed|work performed|logbook|industrial training|field training|report writing|objectives?|specific objectives?|general objectives?|chapter|table of contents|references|appendices|conclusion|recommendations|student name|registration number|company name|department|supervisor|date|week\s+\d+)/i;
@@ -428,11 +455,13 @@ setProgress(45,"Extracting the activities and requirements…");const rq=await e
 state.refTexts=[r1,r2];state.activityText=cleanText(rq);state.sourceNames=[state.ref1.name,state.ref2.name,state.req.name];
 for(const f of state.extras){if(f.type.startsWith("image/"))continue;try{state.activityText+="\n\n"+cleanText(await extract(f));state.sourceNames.push(f.name);}catch(e){console.warn(e);}}
 state.structure=detectHeadings(r1);const second=detectHeadings(r2);if(state.structure.length<5)state.structure=second;
-state.activities=parseActivities(rq);
+state.activities=parseLogbookActivities(rq);
+if(state.activities.length===0)state.activities=parseLogbookActivities(state.activityText);
+if(state.activities.length===0)state.activities=parseActivities(rq);
 if(state.activities.length===0)state.activities=parseActivities(state.activityText);
 setProgress(80,"Comparing report structures and checking activity coverage…");
 $("structureList").innerHTML=state.structure.length?state.structure.map((x,i)=>'<div class="mb-1"><span class="text-primary fw-bold">'+(i+1)+'.</span> '+esc(x)+'</div>').join(""):"The reference headings could not be read clearly. A standard academic report structure will be used.";
-$("activitiesList").innerHTML=state.activities.length?state.activities.map((x,i)=>'<div class="mb-2"><span class="activity-chip">'+(i+1)+". "+esc(x)+'</span></div>').join(""):"No separate task statements were detected. The activity document may be scanned; provide a text-based PDF/DOCX or type the activity details in the additional facts box.";
+$("activitiesList").innerHTML=state.activities.length?state.activities.map((x,i)=>'<div class="mb-2"><span class="activity-chip">'+(i+1)+". "+esc(x)+'</span></div>').join(""):"The text was extracted, but no task rows were recognised. The report generator now checks logbook date-and-hours rows as well as ordinary paragraphs; you can also add verified tasks in the report details.";
 $("sourcePreview").textContent=state.activityText.slice(0,6500)+(state.activityText.length>6500?"\n\n[Preview shortened; full extracted text is retained for report generation.]":"");
 $("build").disabled=state.activities.length===0&&!$("extraFacts").value.trim();
 setProgress(100,"Analysis complete. The sample reports will be used for layout only; the activity-review document will supply the report's actual tasks.");
