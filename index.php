@@ -309,7 +309,7 @@ aside .cardx.side .small{color:#34483d!important;line-height:1.65!important}
 <div class="mt-3"><h6 class="fw-bold">Extracted activity source preview</h6><div id="sourcePreview" class="previewbox">Waiting for analysis…</div></div>
 <div class="d-flex justify-content-between mt-4"><button class="btn btn-outline-secondary" id="back3">Back</button><button class="btn btn-success" id="build" disabled><i class="bi bi-file-earmark-richtext me-1"></i>Generate full report</button></div></section>
 <section id="step5" class="hidden"><span class="eyebrow">STEP 05 / FINISHED REPORT</span><h2 class="title mt-3">Your report is ready</h2><p class="sub">The report is fully written from the activity source, follows the detected report structure and includes relevant online illustrations. Review and edit it, then download or print.</p>
-<div class="d-flex flex-wrap gap-2 no-print mb-3"><button class="btn btn-primary" id="downloadDocx"><i class="bi bi-file-earmark-word me-1"></i>Download Word (.docx)</button><button class="btn btn-danger" id="downloadPdf"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</button><button class="btn btn-outline-primary" id="downloadHtml"><i class="bi bi-filetype-html me-1"></i>Download report copy</button><button class="btn btn-outline-dark" id="printReport"><i class="bi bi-printer me-1"></i>Print / Save PDF</button><button class="btn btn-outline-secondary" id="rebuild"><i class="bi bi-arrow-repeat me-1"></i>Regenerate</button></div>
+<div class="d-flex flex-wrap gap-2 no-print mb-3"><button class="btn btn-primary" id="downloadDocx"><i class="bi bi-file-earmark-word me-1"></i>Download Word (.docx)</button><button class="btn btn-danger" id="downloadPdf"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</button><button class="btn btn-outline-primary" id="downloadHtml"><i class="bi bi-filetype-html me-1"></i>Download report copy</button><button class="btn btn-outline-success" id="downloadResearchImages" disabled><i class="bi bi-images me-1"></i>Download research images</button><button class="btn btn-outline-dark" id="printReport"><i class="bi bi-printer me-1"></i>Print / Save PDF</button><button class="btn btn-outline-secondary" id="rebuild"><i class="bi bi-arrow-repeat me-1"></i>Regenerate</button></div>
 <div class="info no-print mb-3" id="reportStats"></div><div class="small mb-3" id="exportStatus" role="status" aria-live="polite"></div><div class="report-shell"><div id="report" class="report-paper" contenteditable="true" spellcheck="true"></div></div>
 <div class="d-flex justify-content-between mt-4 no-print"><button class="btn btn-outline-secondary" id="back4">Back to analysis</button><button class="btn btn-primary" id="startOver">Create another report</button></div></section>
 </div></main></div></div>
@@ -456,6 +456,22 @@ if(!it)return null;const info=it.imageinfo[0],meta=info.extmetadata||{};
 return {url:info.thumburl||info.url,source:info.descriptionurl||info.url,title:it.title||term,artist:(meta.Artist&&meta.Artist.value||"").replace(/<[^>]*>/g,"").slice(0,180),license:(meta.LicenseShortName&&meta.LicenseShortName.value)||"Wikimedia Commons"};
 }).catch(()=>null);
 }
+async function embedResearchImage(image){
+if(!image||!image.url)return image;
+try{
+const response=await fetch(image.url,{mode:"cors",credentials:"omit",cache:"force-cache"});
+if(!response.ok)throw new Error("Image request failed");
+const blob=await response.blob();
+if(!blob.type.startsWith("image/"))throw new Error("Not an image");
+const data=await new Promise((resolve,reject)=>{
+const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);
+});
+return {...image,data};
+}catch(error){
+console.warn("Research image could not be embedded; keeping its source URL",image.url,error);
+return image;
+}
+}
 function imageQueryFor(task){
 const t=task.toLowerCase();
 if(/rj.?45|ethernet|patch panel/.test(t))return "RJ45 Ethernet connector cable";
@@ -512,7 +528,7 @@ pages.push(makePage("Department and Working Environment",'<h3>2.3 Department of 
 pages.push(makePage(chapterName(2,"CHAPTER THREE: ACTIVITIES PERFORMED"),'<h3>3.1 Overview of Practical Activities</h3>'+p("This chapter discusses the practical activities identified in the activity-review document. The two sample reports were not used as sources of factual content; they were examined only to determine the expected report structure and writing presentation. Each activity is discussed in terms of its technical purpose, relevant concepts, workplace application and learning value. The account does not add exact equipment models, command output, network addresses, measurements or repair outcomes unless those details were contained in the activity source.")+p("The activities are presented separately to show the relationship between each task, the technical knowledge involved and the workplace responsibilities associated with it.")));
 for(let i=0;i<grouped.length;i++){
 const task=grouped[i],c=categoryText(task),im=state.images[i]||null;
-let fig=im?'<figure><img src="'+esc(im.url)+'" alt="'+esc(c.name)+'"><figcaption>Figure 3.'+(i+1)+': '+esc(c.name)+'. Source: Wikimedia Commons, '+esc(im.title)+'. '+esc(im.license)+'.</figcaption></figure>':'';
+let fig=im?'<figure><img src="'+esc(im.data||im.url)+'" alt="'+esc(c.name)+'"><figcaption>Figure 3.'+(i+1)+': '+esc(c.name)+'. Source: Wikimedia Commons, '+esc(im.title)+'. '+esc(im.license)+'.</figcaption></figure>':'';
 let text1='<h3>3.'+(i+2)+' '+esc(c.name)+'</h3>'+p("The activity review records the following task: "+task+". This task is discussed as part of the student's practical exposure at "+company+". Its inclusion in the report is based on the supplied activity record rather than on the example reports, which were used only to identify the format.")+p(c.purpose)+p(c.principles)+p(c.practice);
 let text2=p(c.learning)+p("In carrying out work of this nature, technical accuracy must be supported by appropriate supervision, safe handling of equipment and respect for organisational procedures. The trainee should understand the objective of the task before beginning, clarify unfamiliar instructions and seek assistance when a task falls outside the trainee's authority or competence. These practices reduce the likelihood of avoidable errors and help maintain continuity of service.")+p("The activity statement provides the factual basis for the discussion. The technical explanation places the work in its wider operational context and shows how the activity contributes to reliable ICT services.")+fig;
 pages.push(makePage("Activity "+(i+1),text1));
@@ -539,8 +555,12 @@ state.images=[];const tasks=state.activities.slice(0,24),groups=tasks.length>12?
 $("reportStats").textContent="Building report pages…";
 $("report").innerHTML=makeReport();
 /* Online illustrations are optional: load them in parallel with a short timeout so a slow image host cannot block report creation. */
-const imageJobs=groups.map(task=>Promise.race([sourceImage(imageQueryFor(task)),new Promise(resolve=>setTimeout(()=>resolve(null),4500))]));
+const imageJobs=groups.map(async task=>{
+const found=await Promise.race([sourceImage(imageQueryFor(task)),new Promise(resolve=>setTimeout(()=>resolve(null),12000))]);
+return found?await embedResearchImage(found):null;
+});
 state.images=await Promise.all(imageJobs);
+$("downloadResearchImages").disabled=!state.images.some(Boolean);
 if(state.images.some(Boolean)){$("report").innerHTML=makeReport();}
 const roman=["i","ii","iii","iv","v","vi","vii","viii","ix","x"];document.querySelectorAll("#report .report-page").forEach((pg,i)=>{const pn=pg.querySelector(".page-number");if(pn)pn.textContent=i===0?"":(i<=5?roman[i-1]:String(i-5));});
 const words=$("report").innerText.trim().split(/\s+/).length;const pageCount=document.querySelectorAll("#report .report-page").length;
@@ -585,6 +605,35 @@ function downloadWordFile(){
   const blob=new Blob(["\\ufeff",html],{type:"application/msword;charset=utf-8"});
   saveBlob(blob,"Raymond-Industrial-Training-Report.doc");
 }
+$("downloadResearchImages").onclick=async()=>{
+const btn=$("downloadResearchImages"),old=btn.innerHTML;
+const images=state.images.filter(Boolean);
+if(!images.length){$("exportStatus").textContent="No research images were found for this report. Check your internet connection and regenerate the report.";return;}
+btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Downloading images…';
+let saved=0,failed=0;
+for(let i=0;i<images.length;i++){
+const im=images[i];
+try{
+let blob;
+if(im.data){
+const parts=im.data.split(","),mime=(parts[0].match(/:(.*?);/)||[])[1]||"image/jpeg";
+const raw=atob(parts[1]),bytes=new Uint8Array(raw.length);
+for(let j=0;j<raw.length;j++)bytes[j]=raw.charCodeAt(j);
+blob=new Blob([bytes],{type:mime});
+}else{
+const response=await fetch(im.url,{mode:"cors",credentials:"omit"});
+if(!response.ok)throw new Error("Image download failed");
+blob=await response.blob();
+}
+const ext=(blob.type.split("/")[1]||"jpg").replace("jpeg","jpg").replace(/[^a-z0-9]/gi,"");
+saveBlob(blob,"Raymond-Research-Image-"+String(i+1).padStart(2,"0")+"."+ext);
+saved++;
+await new Promise(resolve=>setTimeout(resolve,450));
+}catch(error){failed++;console.warn("Could not download research image",im.title,error);}
+}
+$("exportStatus").textContent=saved+" research image(s) downloaded"+(failed?"; "+failed+" could not be downloaded because the image source blocked direct access.":".");
+btn.disabled=false;btn.innerHTML=old;
+};
 $("downloadHtml").onclick=()=>{
   try{downloadWordFile();$("exportStatus").textContent="Word document (.doc) downloaded. Open it with Microsoft Word; it contains the report text and evidence photographs.";}
   catch(e){$("exportStatus").textContent="Word download failed: "+e.message;}
